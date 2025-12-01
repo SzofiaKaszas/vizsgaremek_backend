@@ -14,3 +14,96 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model UserLogin{
+  idUserLogin Int @id @default(autoincrement())
+  UserLoginIdUser Int @unique
+ 
+  password String
+  email String
+ 
+  user User @relation(fields: [UserLoginIdUser],references: [idUser])
+}
+ 
+model User{
+  idUser Int @id @default(autoincrement())
+  firstName String
+  lastName String
+  connectionEmail String
+  phoneNumber String
+ 
+  userBio String?
+  age Int?
+  gender String?
+  language String?
+  occupation String?
+ 
+  hasHouse Boolean
+  lookingForPeople Boolean
+ 
+  login UserLogin[]
+  houses HouseListing[]
+  houseSearchPrefrenc HouseSearchPrefrences[]
+}
+ 
+enum PropertyType{
+  house
+  flat
+  skyscraper
+}
+ 
+enum HeatingType{
+  radiator
+  airconditioner
+  convector
+  floor
+}
+ 
+enum FurnishingLevel{
+  none
+  partial
+  full
+}
+enum KitchenLevel{
+  none
+  partial
+  full
+}
+ 
+ 
+model HouseListing{
+  idHouse Int @id @default(autoincrement())
+  houseIdUser Int
+ 
+  description String
+  location String
+  city String
+  rent Float
+  propertyType PropertyType
+  whichFloor Int?
+  numberOfRooms Int
+  squareMeter Float
+  heatingType HeatingType
+  furnishingLevel FurnishingLevel
+  kitchenLevel KitchenLevel
+  bathrooms Int
+  airConditioner Boolean
+ 
+  user User? @relation(fields: [houseIdUser],references: [idUser])
+}
+ 
+model HouseSearchPrefrences{
+  idHousePrefrences Int @id @default(autoincrement())
+  houseSearchIdUser Int
+ 
+  maxRent Float?
+  minSquareMeters Float?
+  minRooms Int?
+  city String?
+  heatingType HeatingType?
+  furnishingLevel FurnishingLevel?
+  kitchenLevel KitchenLevel?
+  minBathrooms Int?
+ 
+  user User? @relation(fields: [houseSearchIdUser],references: [idUser])
+}
