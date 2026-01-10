@@ -15,37 +15,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UserLogin{
-  idUserLogin Int @id @default(autoincrement())
-  UserLoginIdUser Int @unique
- 
-  password String
-  email String
- 
-  user User @relation(fields: [UserLoginIdUser],references: [idUser])
-}
- 
-model User{
-  idUser Int @id @default(autoincrement())
-  firstName String
-  lastName String
-  connectionEmail String
-  phoneNumber String
- 
-  userBio String?
-  age Int?
-  gender String?
-  language String?
-  occupation String?
- 
-  hasHouse Boolean
-  lookingForPeople Boolean
- 
-  login UserLogin[]
-  houses HouseListing[]
-  houseSearchPrefrenc HouseSearchPrefrences[]
-}
- 
+// ------------------ Enums ------------------
 enum PropertyType{
   house
   flat
@@ -64,46 +34,131 @@ enum FurnishingLevel{
   partial
   full
 }
+
 enum KitchenLevel{
   none
   partial
   full
 }
+
+// ------------------ Models ------------------
+//UserLogin Model to store user login credentials (done)
+model UserLogin{ 
+  idUserLogin Int @id @default(autoincrement())
+  UserLoginIdUser Int @unique //foreign key to User model, there cant be multiple logins for one user
  
+  password String
+  email String
  
+  user User @relation(fields: [UserLoginIdUser],references: [idUser])
+}
+
+//UserToken Model to store user authentication tokens (done)
+model UserToken{
+  idUserToken Int @id @default(autoincrement())
+  userIdToken Int //foreign key to User model, there can be multiple tokens for one user
+ 
+  token String
+  expirationDate DateTime
+ 
+  user User @relation(fields: [userIdToken],references: [idUser])
+}
+
+//User Model to store user profile information 
+//and this is the main table that everything is connected to (done)
+model User{
+  idUser Int @id @default(autoincrement())
+  firstName String
+  lastName String
+  connectionEmail String
+  phoneNumber String
+ 
+ //optional fields if you are looking for roommates
+  userBio String?
+  age Int?
+  gender String?
+  language String?
+  occupation String?
+ 
+  hasHouse Boolean
+  lookingForPeople Boolean
+ 
+  login UserLogin?
+  tokens UserToken[]
+  attributes UserAttributes[]
+  roommatesPrefrences RoommatesPrefrences?
+  houses HouseListing[]
+  houseSearchPrefrenc HouseSearchPrefrences?
+}
+
+//+Attributes the user can select for their about themselves (done)
+model UserAttributes{
+  idUserAttributes Int @id @default(autoincrement())
+
+  attributeName String //e.g. "Non-smoker", "Pet lover", "Early riser", etc.
+
+  Users User[] //relation to HouseListing model, N-to-Many
+}
+
+model RoommatesPrefrences{
+  idRoommatesPrefrences Int @id @default(autoincrement())
+  roommatesPrefrencesIdUser Int @unique //foreign key to User model, one user can have only one set of roommate prefrences
+ 
+  //optional fields cus the user might not want to set any prefrences
+  minAge Int?
+  maxAge Int?
+  gender String?
+  language String?
+
+  user User? @relation(fields: [roommatesPrefrencesIdUser],references: [idUser]) //relation to User model but not everyone is looking for roommates
+}
+
+//HouseListing Model to store house listings posted by users (done)
 model HouseListing{
   idHouse Int @id @default(autoincrement())
-  houseIdUser Int
+  houseIdUser Int //foreign key to User model, there can be multiple listings for one user
  
   description String
   location String
   city String
   rent Float
-  propertyType PropertyType
-  whichFloor Int?
+  propertyType PropertyType //enum
+  whichFloor Int? //if its in a building complex
   numberOfRooms Int
   squareMeter Float
-  heatingType HeatingType
-  furnishingLevel FurnishingLevel
-  kitchenLevel KitchenLevel
+  heatingType HeatingType //enum
+  furnishingLevel FurnishingLevel //enum
+  kitchenLevel KitchenLevel //enum
   bathrooms Int
   airConditioner Boolean
  
-  user User? @relation(fields: [houseIdUser],references: [idUser])
+  user User? @relation(fields: [houseIdUser],references: [idUser]) //relation to User model but not everyone has a listing
+  HouseAttributes HouseAttributes[] //relation to HouseAttributes model, N-to-Many
 }
- 
+
+//+Attributes the user can select for their house listing (done)
+model HouseAttributes{
+  idHouseAttributes Int @id @default(autoincrement())
+
+  attributeName String //e.g. "Smoking", "Garden", "Parking", etc.
+
+  Listings HouseListing[] //relation to HouseListing model, N-to-Many
+}
+
 model HouseSearchPrefrences{
   idHousePrefrences Int @id @default(autoincrement())
-  houseSearchIdUser Int
+  houseSearchIdUser Int @unique //foreign key to User model, one user can have only one set of search prefrences
  
+  //these are optional cus if the user doesnt set them, they shouldnt filter anything
   maxRent Float?
   minSquareMeters Float?
   minRooms Int?
   city String?
+  propertyType PropertyType?
   heatingType HeatingType?
   furnishingLevel FurnishingLevel?
   kitchenLevel KitchenLevel?
   minBathrooms Int?
  
-  user User? @relation(fields: [houseSearchIdUser],references: [idUser])
+  user User? @relation(fields: [houseSearchIdUser],references: [idUser]) //relation to User model but not everyone is looking for houses
 }
