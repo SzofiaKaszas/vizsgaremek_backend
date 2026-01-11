@@ -1,0 +1,25 @@
+API
+
+/user
+
+GET
+:id/necessary 
+this is for data thats necessary to make profile (if we want to display profile to user)
+
+:id
+this is to display all data of a user if they want to change something
+
+/
+this is to get all data to display the users to people who are looking for roommates
+
+POST
+/
+this is to make a new user
+
+PATCH
+:id
+this is to change something about a users profile
+
+DELETE
+:id
+this is to delete a user

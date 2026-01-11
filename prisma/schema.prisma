@@ -42,6 +42,36 @@ enum KitchenLevel{
 }
 
 // ------------------ Models ------------------
+
+//User Model to store user profile information 
+//and this is the main table that everything is connected to (done)
+//***User tables API is src/user***
+model User{
+  idUser Int @id @default(autoincrement())
+  firstName String
+  lastName String
+  connectionEmail String //contactemail (the right word)
+  phoneNumber String
+ 
+ //optional fields if you are looking for roommates
+  userBio String?
+  age Int?
+  gender String? //maybe enum later
+  language String?
+  occupation String?
+ 
+  hasHouse Boolean
+  lookingForPeople Boolean
+  //lookingForHouse Boolean
+ 
+  login UserLogin?
+  tokens UserToken[]
+  attributes UserAttributes[]
+  roommatesPrefrences RoommatesPrefrences?
+  houses HouseListing[]
+  houseSearchPrefrenc HouseSearchPrefrences?
+}
+
 //UserLogin Model to store user login credentials (done)
 model UserLogin{ 
   idUserLogin Int @id @default(autoincrement())
@@ -64,32 +94,17 @@ model UserToken{
   user User @relation(fields: [userIdToken],references: [idUser])
 }
 
-//User Model to store user profile information 
-//and this is the main table that everything is connected to (done)
-model User{
-  idUser Int @id @default(autoincrement())
-  firstName String
-  lastName String
-  connectionEmail String
-  phoneNumber String
- 
- //optional fields if you are looking for roommates
-  userBio String?
-  age Int?
-  gender String?
-  language String?
-  occupation String?
- 
-  hasHouse Boolean
-  lookingForPeople Boolean
- 
-  login UserLogin?
-  tokens UserToken[]
-  attributes UserAttributes[]
-  roommatesPrefrences RoommatesPrefrences?
-  houses HouseListing[]
-  houseSearchPrefrenc HouseSearchPrefrences?
+/* for pictures - might be implemented later
+model ProfileImage {
+  idProfileImage Int @id @default(autoincrement())
+  url String
+  isCover Boolean @default(false)
+  uploadedAt DateTime @default(now()) ?
+  userId Int
+
+  user User @relation(fields: [userId], references: [idUser], onDelete: Cascade)
 }
+*/
 
 //+Attributes the user can select for their about themselves (done)
 model UserAttributes{
@@ -134,16 +149,20 @@ model HouseListing{
  
   user User? @relation(fields: [houseIdUser],references: [idUser]) //relation to User model but not everyone has a listing
   HouseAttributes HouseAttributes[] //relation to HouseAttributes model, N-to-Many
+  //images HouseImage[]
 }
 
-//+Attributes the user can select for their house listing (done)
-model HouseAttributes{
-  idHouseAttributes Int @id @default(autoincrement())
+/* for pictures - might be implemented later
+model HouseImage {
+  idHouseImage Int @id @default(autoincrement())
+  url String
+  isCover Boolean @default(false)
+  uploadedAt DateTime @default(now()) ?
+  houseId Int
 
-  attributeName String //e.g. "Smoking", "Garden", "Parking", etc.
-
-  Listings HouseListing[] //relation to HouseListing model, N-to-Many
+  house HouseListing @relation(fields: [houseId], references: [idHouse], onDelete: Cascade)
 }
+*/
 
 model HouseSearchPrefrences{
   idHousePrefrences Int @id @default(autoincrement())
@@ -161,4 +180,13 @@ model HouseSearchPrefrences{
   minBathrooms Int?
  
   user User? @relation(fields: [houseSearchIdUser],references: [idUser]) //relation to User model but not everyone is looking for houses
+}
+
+//+Attributes the user can select for their house listing (done)
+model HouseAttributes{
+  idHouseAttributes Int @id @default(autoincrement())
+
+  attributeName String //e.g. "Smoking", "Garden", "Parking", etc.
+
+  Listings HouseListing[] //relation to HouseListing model, N-to-Many
 }
