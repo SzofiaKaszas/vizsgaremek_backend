@@ -18,20 +18,20 @@ export class HouseListingService {
 
   findOne(id: number) {
     return this.db.houseListing.findUnique({
-      where: { id },
+      where: { idHouse: id },
     });
   }
 
   update(id: number, updateHouseListingDto: UpdateHouseListingDto) {
     return this.db.houseListing.update({
-      where: { id },
+      where: { idHouse: id },
       data: updateHouseListingDto,
     });
   }
 
   remove(id: number) {
     return this.db.houseListing.delete({
-      where: { id },
+      where: { idHouse: id },
     });
   }
 }

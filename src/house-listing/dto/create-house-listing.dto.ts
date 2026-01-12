@@ -1,10 +1,10 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsEnum } from "class-validator";
 
 export class CreateHouseListingDto {
   @IsNotEmpty()
   @IsNumber()
   //@IsPositive()
-  houseIdUser: number;
+  houseIdUser: number;  
 
   @IsNotEmpty()
   @IsString()
@@ -23,8 +23,8 @@ export class CreateHouseListingDto {
   rent: number; //originally float
 
   @IsNotEmpty()
-  @IsString()
-  propertyType: string; //enum
+  @IsEnum(PropertyType)
+  propertyType: PropertyType; //enum
 
   @IsNumber()
   whichFloor?: number;
@@ -38,16 +38,16 @@ export class CreateHouseListingDto {
   squareMeter: number; // originally float
 
   @IsNotEmpty()
-  @IsString()
-  heatingType: string; //enum
+  @IsEnum(HeatingType)
+  heatingType: HeatingType; //enum
 
   @IsNotEmpty()
-  @IsString()
-  furnishingLevel: string; //enum
+  @IsEnum(FurnishingLevel)
+  furnishingLevel: FurnishingLevel; //enum
 
   @IsNotEmpty()
-  @IsString()
-  kitchenLevel: string; //enum
+  @IsEnum(KitchenLevel)
+  kitchenLevel: KitchenLevel; //enum
 
   @IsNotEmpty()
   @IsNumber()

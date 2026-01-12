@@ -8,31 +8,31 @@ export class RoommatesPrefrencesService {
   constructor(private readonly db: PrismaService) {}
   // CRUD METHODS
   create(createRoommatesPrefrenceDto: CreateRoommatesPrefrenceDto) {
-    return this.db.roommatesPrefrence.create({
+    return this.db.roommatesPrefrences.create({
       data: createRoommatesPrefrenceDto,
     });
   }
 
   findAll() {
-    return this.db.roommatesPrefrence.findMany();
+    return this.db.roommatesPrefrences.findMany();
   }
 
   findOne(id: number) {
-    return this.db.roommatesPrefrence.findUnique({
-      where: { id },
+    return this.db.roommatesPrefrences.findUnique({
+      where: { idRoommatesPrefrences: id },
     });
   }
 
   update(id: number, updateRoommatesPrefrenceDto: UpdateRoommatesPrefrenceDto) {
-    return this.db.roommatesPrefrence.update({
-      where: { id },
+    return this.db.roommatesPrefrences.update({
+      where: { idRoommatesPrefrences: id },
       data: updateRoommatesPrefrenceDto,
     });
   }
 
   remove(id: number) {
-    return this.db.roommatesPrefrence.delete({
-      where: { id },
+    return this.db.roommatesPrefrences.delete({
+      where: { idRoommatesPrefrences: id },
     });
   }
 }
