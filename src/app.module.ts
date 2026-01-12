@@ -7,11 +7,12 @@ import { UserLoginModule } from './user-login/user-login.module';
 import { UserTokenModule } from './user-token/user-token.module';
 import { PrismaService } from './prisma.service';
 import { UserAttributesModule } from './user-attributes/user-attributes.module';
+import { RoommatesPrefrencesModule } from './roommates-prefrences/roommates-prefrences.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
-  }), UserModule, UserLoginModule, UserTokenModule, UserAttributesModule],
+  }), UserModule, UserLoginModule, UserTokenModule, UserAttributesModule, RoommatesPrefrencesModule],
   controllers: [AppController],
   providers: [AppService, PrismaService], // Added PrismaService here
 })
