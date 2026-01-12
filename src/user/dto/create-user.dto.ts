@@ -16,24 +16,19 @@ export class CreateUserDto {
   @IsPhoneNumber() //validate phone number format, not sure if it works for all countries
   phoneNumber: string;
 
-  @IsNotEmpty()
   @IsOptional()
   @IsString()
   userBio?: string;
-  @IsNotEmpty()
   @IsOptional()
   @IsInt()
   @IsPositive() //age must be positive
   age?: number;
-  @IsNotEmpty()
   @IsOptional()
   @IsString()
   gender?: string; //maybe enum later
-  @IsNotEmpty()
   @IsOptional()
   @IsString()
   language?: string;
-  @IsNotEmpty()
   @IsOptional()
   @IsString()
   occupation?: string;
