@@ -6,11 +6,12 @@ import { UserModule } from './user/user.module';
 import { UserLoginModule } from './user-login/user-login.module';
 import { UserTokenModule } from './user-token/user-token.module';
 import { PrismaService } from './prisma.service';
+import { UserAttributesModule } from './user-attributes/user-attributes.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
-  }), UserModule, UserLoginModule, UserTokenModule],
+  }), UserModule, UserLoginModule, UserTokenModule, UserAttributesModule],
   controllers: [AppController],
   providers: [AppService, PrismaService], // Added PrismaService here
 })
