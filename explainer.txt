@@ -1,5 +1,5 @@
-Have to solve:
-export enums from prisma schema. So if we change it it changes everywhere
+Solved problems:
+export enums from prisma schema. So if we change it it changes everywhere => import from "generated/prisma/enums" prisma generates export for the enums
 
 API
 
