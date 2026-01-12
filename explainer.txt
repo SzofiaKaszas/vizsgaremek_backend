@@ -1,3 +1,7 @@
+Question:
+How do we store who "matched" or what you liked? -> i think we would need a table or at least a list in User to  store it
+Do we want chatting? Or just after we are done with everything?
+
 Solved problems:
 export enums from prisma schema. So if we change it it changes everywhere => import from "generated/prisma/enums" prisma generates export for the enums
 

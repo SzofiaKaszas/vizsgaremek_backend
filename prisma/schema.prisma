@@ -70,6 +70,11 @@ model User{
   roommatesPrefrences RoommatesPrefrences?
   houses HouseListing[]
   houseSearchPrefrenc HouseSearchPrefrences?
+  /*
+  likedRoommates LikedRoommate[] @relation("UserLikes")
+  likedBy        LikedRoommate[] @relation("UserLikedBy")
+  likedHouses LikedHouse[]
+  */
 }
 
 //UserLogin Model to store user login credentials (done)
@@ -118,6 +123,24 @@ model UserAttributes{
   Users User[] //relation to HouseListing model, N-to-Many
 }
 
+/*
+//LikedRoommate Model to store which users liked which other users
+model LikedRoommate {
+  id Int @id @default(autoincrement())
+
+  likerId Int
+  likedUserId Int
+
+  createdAt DateTime @default(now())
+
+  liker User @relation("UserLikes", fields: [likerId], references: [idUser], onDelete: Cascade)
+  liked User @relation("UserLikedBy", fields: [likedUserId], references: [idUser], onDelete: Cascade)
+
+  @@unique([likerId, likedUserId])
+}
+
+*/
+
 //RoommatesPrefrences Model to store user prefrences for roommates (maybe add more fields later)
 //***RoommatesPrefrences tables API is src/roommates-prefrences***
 model RoommatesPrefrences{
@@ -134,6 +157,7 @@ model RoommatesPrefrences{
 }
 
 //HouseListing Model to store house listings posted by users (done)
+//***HouseListing tables API is src/house-listing***
 model HouseListing{
   idHouse Int @id @default(autoincrement())
   houseIdUser Int //foreign key to User model, there can be multiple listings for one user
@@ -155,6 +179,7 @@ model HouseListing{
   user User? @relation(fields: [houseIdUser],references: [idUser]) //relation to User model but not everyone has a listing
   HouseAttributes HouseAttributes[] //relation to HouseAttributes model, N-to-Many
   //images HouseImage[]
+  //likedBy LikedHouse[]
 }
 
 /* for pictures - might be implemented later
@@ -169,6 +194,8 @@ model HouseImage {
 }
 */
 
+//HouseSearchPrefrences Model to store user prefrences for house searching (maybe add more fields later)
+//***HouseSearchPrefrences tables API is src/house-search-prefrences***
 model HouseSearchPrefrences{
   idHousePrefrences Int @id @default(autoincrement())
   houseSearchIdUser Int @unique //foreign key to User model, one user can have only one set of search prefrences
@@ -188,6 +215,7 @@ model HouseSearchPrefrences{
 }
 
 //+Attributes the user can select for their house listing (done)
+//****HouseAttributes tables API is src/house-attributes***/
 model HouseAttributes{
   idHouseAttributes Int @id @default(autoincrement())
 
@@ -195,3 +223,20 @@ model HouseAttributes{
 
   Listings HouseListing[] //relation to HouseListing model, N-to-Many
 }
+
+/*
+//LikedHouse Model to store which users liked which house listings
+model LikedHouse {
+  id Int @id @default(autoincrement())
+
+  userId Int
+  houseId Int
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [idUser], onDelete: Cascade)
+  house HouseListing @relation(fields: [houseId], references: [idHouse], onDelete: Cascade)
+
+  @@unique([userId, houseId])
+}
+*/
