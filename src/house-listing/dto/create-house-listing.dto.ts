@@ -1,4 +1,5 @@
 import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsEnum } from "class-validator";
+import { FurnishingLevel, HeatingType, KitchenLevel, PropertyType } from "generated/prisma/enums";
 
 export class CreateHouseListingDto {
   @IsNotEmpty()
