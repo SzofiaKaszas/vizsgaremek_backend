@@ -44,7 +44,7 @@ enum KitchenLevel{
 // ------------------ Models ------------------
 
 //User Model to store user profile information 
-//and this is the main table that everything is connected to (done)
+//and this is the main table that everything is connected to (maybe change later)
 //***User tables API is src/user***
 model User{
   idUser Int @id @default(autoincrement())
@@ -73,6 +73,7 @@ model User{
 }
 
 //UserLogin Model to store user login credentials (done)
+//***UserLogin tables API is src/user-login***
 model UserLogin{ 
   idUserLogin Int @id @default(autoincrement())
   UserLoginIdUser Int @unique //foreign key to User model, there cant be multiple logins for one user

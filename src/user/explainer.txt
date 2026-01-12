@@ -1,3 +1,6 @@
+Have to solve:
+export enums from prisma schema. So if we change it it changes everywhere
+
 API
 
 /user
