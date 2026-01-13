@@ -52,6 +52,9 @@ model User{
   lastName String
   connectionEmail String //contactemail (the right word)
   phoneNumber String
+
+  password String
+  email String @unique
  
  //optional fields if you are looking for roommates
   userBio String?
@@ -64,9 +67,9 @@ model User{
   lookingForPeople Boolean
   //lookingForHouse Boolean
  
-  login UserLogin?
+  
   tokens UserToken[]
-  attributes UserAttributes[]
+
   roommatesPrefrences RoommatesPrefrences?
   houses HouseListing[]
   houseSearchPrefrenc HouseSearchPrefrences?
@@ -77,17 +80,7 @@ model User{
   */
 }
 
-//UserLogin Model to store user login credentials (done)
-//***UserLogin tables API is src/user-login***
-model UserLogin{ 
-  idUserLogin Int @id @default(autoincrement())
-  UserLoginIdUser Int @unique //foreign key to User model, there cant be multiple logins for one user
- 
-  password String
-  email String
- 
-  user User @relation(fields: [UserLoginIdUser],references: [idUser])
-}
+
 
 //UserToken Model to store user authentication tokens (done)
 //***UserToken tables API is src/user-token***
@@ -113,15 +106,7 @@ model ProfileImage {
 }
 */
 
-//+Attributes the user can select for their about themselves (done)
-//***UserAttributes tables API is src/user-attributes***
-model UserAttributes{
-  idUserAttributes Int @id @default(autoincrement())
 
-  attributeName String //e.g. "Non-smoker", "Pet lover", "Early riser", etc.
-
-  Users User[] //relation to HouseListing model, N-to-Many
-}
 
 /*
 //LikedRoommate Model to store which users liked which other users
@@ -177,7 +162,7 @@ model HouseListing{
   airConditioner Boolean
  
   user User? @relation(fields: [houseIdUser],references: [idUser]) //relation to User model but not everyone has a listing
-  HouseAttributes HouseAttributes[] //relation to HouseAttributes model, N-to-Many
+
   //images HouseImage[]
   //likedBy LikedHouse[]
 }
@@ -214,15 +199,7 @@ model HouseSearchPrefrences{
   user User? @relation(fields: [houseSearchIdUser],references: [idUser]) //relation to User model but not everyone is looking for houses
 }
 
-//+Attributes the user can select for their house listing (done)
-//****HouseAttributes tables API is src/house-attributes***/
-model HouseAttributes{
-  idHouseAttributes Int @id @default(autoincrement())
 
-  attributeName String //e.g. "Smoking", "Garden", "Parking", etc.
-
-  Listings HouseListing[] //relation to HouseListing model, N-to-Many
-}
 
 /*
 //LikedHouse Model to store which users liked which house listings
