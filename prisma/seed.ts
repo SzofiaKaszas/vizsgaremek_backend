@@ -11,8 +11,13 @@ const prisma = new PrismaClient()
 
 async function main() {
   await prisma.$transaction(async tx =>{
+    
+    const userIds: number [] = []
+
+
+    //User
     for (let i = 0; i <10 ; i++){
-      await tx.user.create({
+      const xUser = await tx.user.create({
         data:{
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
@@ -27,11 +32,30 @@ async function main() {
 
           //optional
           userBio: faker.person.bio(),
-          //age: faker.number.bigInt({min:16,max: 80})
-          gender: faker.person.gender()
+          age: faker.number.int({min:18, max:80}),
+          gender: faker.person.gender(),
+          language: faker.location.language().name,
+          occupation: faker.person.jobTitle(),
+          
+
+        }
+      })
+      userIds.push(xUser.idUser)
+    }
+    
+    //UserToken
+    for (let i = 0; i <userIds.length ; i++){
+      const xToken = await tx.userToken.create({
+        data:{
+          userIdToken: faker.helpers.arrayElement(userIds),
+          token: faker.string.uuid(),
+          expirationDate: faker.date.future(),
+
         }
       })
     }
+
+    
 })
 }
 main()
