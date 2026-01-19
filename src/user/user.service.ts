@@ -12,6 +12,17 @@ export class UserService {
     return this.db.user.create({ data: createUserDto });
   }
 
+  Login(email: string, password: string) {
+    return this.db.user.findUnique({
+      where: { email: email, password: password },
+      select: {
+        idUser: true,
+        email: true,
+        password: true,
+      },
+    });
+  }
+
   //get one user by id with necessary data
   getNecessary(id: number) {
     return this.db.user.findUnique({
@@ -21,7 +32,7 @@ export class UserService {
         firstName: true,
         lastName: true,
         connectionEmail: true,
-        phoneNumber: true
+        phoneNumber: true,
       },
     });
   }

@@ -16,6 +16,14 @@ export class CreateUserDto {
   @IsPhoneNumber() //validate phone number format, not sure if it works for all countries
   phoneNumber: string;
 
+  @IsNotEmpty()
+  @IsString()
+  password : string;
+  @IsNotEmpty()
+  @IsString()
+  @IsEmail()
+  email : string;
+
   @IsOptional()
   @IsString()
   userBio?: string;

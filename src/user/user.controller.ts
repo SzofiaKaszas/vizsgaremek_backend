@@ -16,9 +16,14 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   //create a new user
-  @Post()
+  @Post('register')
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
+  }
+
+  @Post('login')
+  getLoginDataByEmail(@Body('email') email: string, @Body('password') password: string) {
+    return this.userService.Login(email, password);
   }
 
   //get one user by id with necessary data
