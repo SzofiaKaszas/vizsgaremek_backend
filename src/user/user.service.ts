@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import * as argon2 from 'argon2';
+import * as crypto from 'node:crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -9,7 +11,30 @@ export class UserService {
 
   //create a new user
   create(createUserDto: CreateUserDto) {
-    return this.db.user.create({ data: createUserDto });
+    const newUser = {
+      ...createUserDto,
+      role: 'user',
+      password: await argon2.hash(createUserDto.password),
+    };
+    return await this.db.user.create({
+      data: newUser,
+      omit: {
+        password: true,
+      },
+    });
+  }
+
+  async createToken(id: number) {
+    const newToken = crypto.randomBytes(32).toString('hex');
+    await this.db.token.create({
+      data: {
+        token: newToken,
+        user: {
+          connect: { id },
+        },
+      },
+    });
+    return newToken;
   }
 
   Login(email: string, password: string) {
