@@ -21,7 +21,7 @@ async function main() {
         data:{
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
-          connectionEmail: faker.internet.email(),
+          
           phoneNumber: faker.phone.number(),
           
           password: faker.internet.password(),
@@ -36,7 +36,7 @@ async function main() {
           gender: faker.person.gender(),
           language: faker.location.language().name,
           occupation: faker.person.jobTitle(),
-          
+          connectionEmail:faker.internet.email()
 
         }
       })
@@ -54,6 +54,46 @@ async function main() {
         }
       })
     }
+    //RoommatesPrefrences
+   /* for (let i = 0 ;i<10; i++){
+      const xRoommatesPrefrences=await ts.rommates.create({
+        data:{
+          minAge:faker.number.int({min:16, max:25 }),
+          maxAng:faker.number.imt({min:25, max:99 }),
+          gender:faker.person.gender(),
+          language:faker.location.language().name
+
+        }
+          
+      
+      })
+    }*/
+    //HouseListing
+    for(let i= 0;i<20;i++){
+      const xHouseListing=await tx.house.create({
+        data:{
+          //description
+          //location:faker.location.con
+          city:faker.location.city(),
+          rent:faker.datatype.boolean(),
+          //propertyType
+          whichFloor:faker.number.int({min:0, max:30}),
+          numberOfRooms:faker.number.int({min:1, max:30}),
+          squareMeter:faker.number.float({ min: 10, max: 100, fractionDigits: 2 }),
+          //heatingType 
+          //furnishingLevel
+          //kitchenLevel
+          bathrooms:faker.number.int({min:0,max:3 }),
+          airConditioner:faker.boolean()
+          }
+          
+        })
+         
+      
+      }
+      //HouseSearchPrefrences
+
+
 
     
 })
