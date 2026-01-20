@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -16,26 +16,26 @@ datasource db {
 }
 
 // ------------------ Enums ------------------
-enum PropertyType{
+enum PropertyType {
   house
   flat
   skyscraper
 }
- 
-enum HeatingType{
+
+enum HeatingType {
   radiator
   airconditioner
   convector
   floor
 }
- 
-enum FurnishingLevel{
+
+enum FurnishingLevel {
   none
   partial
   full
 }
 
-enum KitchenLevel{
+enum KitchenLevel {
   none
   partial
   full
@@ -46,174 +46,158 @@ enum KitchenLevel{
 //User Model to store user profile information 
 //and this is the main table that everything is connected to (maybe change later)
 //***User tables API is src/user***
-model User{
-  idUser Int @id @default(autoincrement())
-  firstName String
-  lastName String
-  connectionEmail String //contactemail (the right word)
+model User {
+  idUser      Int    @id @default(autoincrement())
+  firstName   String
+  lastName    String
   phoneNumber String
 
   password String
-  email String @unique
- 
- //optional fields if you are looking for roommates
-  userBio String?
-  age Int?
-  gender String? //maybe enum later
-  language String?
-  occupation String?
- 
-  hasHouse Boolean
+  email    String @unique
+
+  //optional fields if you are looking for roommates
+  userBio         String?
+  age             Int?
+  gender          String? //maybe enum later
+  language        String?
+  occupation      String?
+  connectionEmail String? //contactemail (the right word)
+
+  hasHouse         Boolean
   lookingForPeople Boolean
   //lookingForHouse Boolean
- 
-  
+
   tokens UserToken[]
 
   roommatesPrefrences RoommatesPrefrences?
-  houses HouseListing[]
+  houses              HouseListing[]
   houseSearchPrefrenc HouseSearchPrefrences?
-  /*
-  likedRoommates LikedRoommate[] @relation("UserLikes")
-  likedBy        LikedRoommate[] @relation("UserLikedBy")
-  likedHouses LikedHouse[]
-  */
+  /**
+   * likedRoommates LikedRoommate[] @relation("UserLikes")
+   * likedBy        LikedRoommate[] @relation("UserLikedBy")
+   * likedHouses LikedHouse[]
+   */
 }
-
-
 
 //UserToken Model to store user authentication tokens (done)
 //***UserToken tables API is src/user-token***
-model UserToken{
+model UserToken {
   idUserToken Int @id @default(autoincrement())
   userIdToken Int //foreign key to User model, there can be multiple tokens for one user
- 
-  token String
+
+  token          String
   expirationDate DateTime
- 
-  user User @relation(fields: [userIdToken],references: [idUser])
+
+  user User @relation(fields: [userIdToken], references: [idUser])
 }
 
-/* for pictures - might be implemented later
-model ProfileImage {
-  idProfileImage Int @id @default(autoincrement())
-  url String
-  isCover Boolean @default(false)
-  uploadedAt DateTime @default(now()) ?
-  userId Int
+/**
+ * for pictures - might be implemented later
+ * model ProfileImage {
+ * idProfileImage Int @id @default(autoincrement())
+ * url String
+ * isCover Boolean @default(false)
+ * uploadedAt DateTime @default(now()) ?
+ * userId Int
+ * user User @relation(fields: [userId], references: [idUser], onDelete: Cascade)
+ * }
+ */
 
-  user User @relation(fields: [userId], references: [idUser], onDelete: Cascade)
-}
-*/
-
-
-
-/*
-//LikedRoommate Model to store which users liked which other users
-model LikedRoommate {
-  id Int @id @default(autoincrement())
-
-  likerId Int
-  likedUserId Int
-
-  createdAt DateTime @default(now())
-
-  liker User @relation("UserLikes", fields: [likerId], references: [idUser], onDelete: Cascade)
-  liked User @relation("UserLikedBy", fields: [likedUserId], references: [idUser], onDelete: Cascade)
-
-  @@unique([likerId, likedUserId])
-}
-
-*/
+/**
+ * //LikedRoommate Model to store which users liked which other users
+ * model LikedRoommate {
+ * id Int @id @default(autoincrement())
+ * likerId Int
+ * likedUserId Int
+ * createdAt DateTime @default(now())
+ * liker User @relation("UserLikes", fields: [likerId], references: [idUser], onDelete: Cascade)
+ * liked User @relation("UserLikedBy", fields: [likedUserId], references: [idUser], onDelete: Cascade)
+ * @@unique([likerId, likedUserId])
+ * }
+ */
 
 //RoommatesPrefrences Model to store user prefrences for roommates (maybe add more fields later)
 //***RoommatesPrefrences tables API is src/roommates-prefrences***
-model RoommatesPrefrences{
-  idRoommatesPrefrences Int @id @default(autoincrement())
+model RoommatesPrefrences {
+  idRoommatesPrefrences     Int @id @default(autoincrement())
   roommatesPrefrencesIdUser Int @unique //foreign key to User model, one user can have only one set of roommate prefrences
- 
+
   //optional fields cus the user might not want to set any prefrences
-  minAge Int?
-  maxAge Int?
-  gender String?
+  minAge   Int?
+  maxAge   Int?
+  gender   String?
   language String?
 
-  user User? @relation(fields: [roommatesPrefrencesIdUser],references: [idUser]) //relation to User model but not everyone is looking for roommates
+  user User? @relation(fields: [roommatesPrefrencesIdUser], references: [idUser]) //relation to User model but not everyone is looking for roommates
 }
 
 //HouseListing Model to store house listings posted by users (done)
 //***HouseListing tables API is src/house-listing***
-model HouseListing{
-  idHouse Int @id @default(autoincrement())
+model HouseListing {
+  idHouse     Int @id @default(autoincrement())
   houseIdUser Int //foreign key to User model, there can be multiple listings for one user
- 
-  description String
-  location String
-  city String
-  rent Float
-  propertyType PropertyType //enum
-  whichFloor Int? //if its in a building complex
-  numberOfRooms Int
-  squareMeter Float
-  heatingType HeatingType //enum
+
+  description     String
+  location        String
+  city            String
+  rent            Float
+  propertyType    PropertyType //enum
+  whichFloor      Int? //if its in a building complex
+  numberOfRooms   Int
+  squareMeter     Float
+  heatingType     HeatingType //enum
   furnishingLevel FurnishingLevel //enum
-  kitchenLevel KitchenLevel //enum
-  bathrooms Int
-  airConditioner Boolean
- 
-  user User? @relation(fields: [houseIdUser],references: [idUser]) //relation to User model but not everyone has a listing
+  kitchenLevel    KitchenLevel //enum
+  bathrooms       Int
+  airConditioner  Boolean
+
+  user User? @relation(fields: [houseIdUser], references: [idUser]) //relation to User model but not everyone has a listing
 
   //images HouseImage[]
   //likedBy LikedHouse[]
 }
 
-/* for pictures - might be implemented later
-model HouseImage {
-  idHouseImage Int @id @default(autoincrement())
-  url String
-  isCover Boolean @default(false)
-  uploadedAt DateTime @default(now()) ?
-  houseId Int
-
-  house HouseListing @relation(fields: [houseId], references: [idHouse], onDelete: Cascade)
-}
-*/
+/**
+ * for pictures - might be implemented later
+ * model HouseImage {
+ * idHouseImage Int @id @default(autoincrement())
+ * url String
+ * isCover Boolean @default(false)
+ * uploadedAt DateTime @default(now()) ?
+ * houseId Int
+ * house HouseListing @relation(fields: [houseId], references: [idHouse], onDelete: Cascade)
+ * }
+ */
 
 //HouseSearchPrefrences Model to store user prefrences for house searching (maybe add more fields later)
 //***HouseSearchPrefrences tables API is src/house-search-prefrences***
-model HouseSearchPrefrences{
+model HouseSearchPrefrences {
   idHousePrefrences Int @id @default(autoincrement())
   houseSearchIdUser Int @unique //foreign key to User model, one user can have only one set of search prefrences
- 
+
   //these are optional cus if the user doesnt set them, they shouldnt filter anything
-  maxRent Float?
+  maxRent         Float?
   minSquareMeters Float?
-  minRooms Int?
-  city String?
-  propertyType PropertyType?
-  heatingType HeatingType?
+  minRooms        Int?
+  city            String?
+  propertyType    PropertyType?
+  heatingType     HeatingType?
   furnishingLevel FurnishingLevel?
-  kitchenLevel KitchenLevel?
-  minBathrooms Int?
- 
-  user User? @relation(fields: [houseSearchIdUser],references: [idUser]) //relation to User model but not everyone is looking for houses
+  kitchenLevel    KitchenLevel?
+  minBathrooms    Int?
+
+  user User? @relation(fields: [houseSearchIdUser], references: [idUser]) //relation to User model but not everyone is looking for houses
 }
 
-
-
-/*
-//LikedHouse Model to store which users liked which house listings
-model LikedHouse {
-  id Int @id @default(autoincrement())
-
-  userId Int
-  houseId Int
-
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [idUser], onDelete: Cascade)
-  house HouseListing @relation(fields: [houseId], references: [idHouse], onDelete: Cascade)
-
-  @@unique([userId, houseId])
-}
-*/
+/**
+ * //LikedHouse Model to store which users liked which house listings
+ * model LikedHouse {
+ * id Int @id @default(autoincrement())
+ * userId Int
+ * houseId Int
+ * createdAt DateTime @default(now())
+ * user User @relation(fields: [userId], references: [idUser], onDelete: Cascade)
+ * house HouseListing @relation(fields: [houseId], references: [idHouse], onDelete: Cascade)
+ * @@unique([userId, houseId])
+ * }
+ */

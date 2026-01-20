@@ -1,4 +1,13 @@
-import { IsBoolean, IsEmail, IsInt, IsNotEmpty, IsOptional, IsPhoneNumber, IsPositive, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -9,20 +18,16 @@ export class CreateUserDto {
   lastName: string;
   @IsNotEmpty()
   @IsString()
-  @IsEmail() //validate email format
-  connectionEmail: string; //contactemail
-  @IsNotEmpty()
-  @IsString()
   @IsPhoneNumber() //validate phone number format, not sure if it works for all countries
   phoneNumber: string;
 
   @IsNotEmpty()
   @IsString()
-  password : string;
+  password: string;
   @IsNotEmpty()
   @IsString()
   @IsEmail()
-  email : string;
+  email: string;
 
   @IsOptional()
   @IsString()
@@ -40,6 +45,10 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   occupation?: string;
+  @IsOptional()
+  @IsString()
+  @IsEmail() //validate email format
+  connectionEmail?: string; //contactemail
 
   @IsNotEmpty()
   @IsBoolean()
