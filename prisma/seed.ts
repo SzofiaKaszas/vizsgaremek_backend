@@ -29,6 +29,7 @@ async function main() {
 
           hasHouse: faker.datatype.boolean(),
           lookingForPeople: faker.datatype.boolean(),
+          lookingForHouse: faker.datatype.boolean(),
 
           //optional
           userBio: faker.person.bio(),

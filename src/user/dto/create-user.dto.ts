@@ -56,7 +56,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsBoolean()
   lookingForPeople: boolean;
-  //@IsNotEmpty()
-  //@IsBoolean()
-  //lookingForHouse: boolean;
+  @IsNotEmpty()
+  @IsBoolean()
+  lookingForHouse: boolean;
 }

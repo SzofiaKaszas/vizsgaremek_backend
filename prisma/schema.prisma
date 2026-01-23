@@ -65,7 +65,7 @@ model User {
 
   hasHouse         Boolean
   lookingForPeople Boolean
-  //lookingForHouse Boolean
+  lookingForHouse Boolean
 
   tokens UserToken[]
 
