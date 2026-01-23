@@ -26,6 +26,12 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Get('me')
+  @UseGuards(AuthGuard('bearer'))
+  getCurrentUser(@Request() request) {
+    return request.user as User;
+  }
+
   //get one user by id with necessary data
   @Get(':id/necessary')
   getPublicData(@Param('id') id: string) {
@@ -47,13 +53,16 @@ export class UserController {
   //update user by id
   @Patch(':id')
   @UseGuards(AuthGuard('bearer'))
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() request) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Request() request,
+  ) {
     const user = request.user as User;
-    if(user.idUser == +id || user.role === 'admin'){
+    if (user.idUser == +id || user.role === 'admin') {
       return this.userService.update(+id, updateUserDto);
-    }
-    else{
-      throw new ForbiddenException("Cannot modify other users' data")
+    } else {
+      throw new ForbiddenException("Cannot modify other users' data");
     }
   }
 

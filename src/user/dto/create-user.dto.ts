@@ -18,7 +18,7 @@ export class CreateUserDto {
   lastName: string;
   @IsNotEmpty()
   @IsString()
-  @IsPhoneNumber() //validate phone number format, not sure if it works for all countries
+  //@IsPhoneNumber() //validate phone number format, not sure if it works for all countries
   phoneNumber: string;
 
   @IsNotEmpty()

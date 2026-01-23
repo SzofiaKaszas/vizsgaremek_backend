@@ -70,13 +70,13 @@ async function main() {
       })
     }*/
     //HouseListing
-    for(let i= 0;i<20;i++){
-      const xHouseListing=await tx.house.create({
+    /*for(let i= 0;i<20;i++){
+      const xHouseListing=await tx.houseListing.create({
         data:{
           //description
           //location:faker.location.con
           city:faker.location.city(),
-          rent:faker.datatype.boolean(),
+          rent:faker.number.int({min:10000, max:500000}),
           //propertyType
           whichFloor:faker.number.int({min:0, max:30}),
           numberOfRooms:faker.number.int({min:1, max:30}),
@@ -85,14 +85,14 @@ async function main() {
           //furnishingLevel
           //kitchenLevel
           bathrooms:faker.number.int({min:0,max:3 }),
-          airConditioner:faker.boolean()
+          airConditioner:faker.datatype.boolean()
           }
           
         })
          
       
       }
-      //HouseSearchPrefrences
+      //HouseSearchPrefrences*/
 
 
 
