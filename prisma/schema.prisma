@@ -65,7 +65,9 @@ model User {
 
   hasHouse         Boolean
   lookingForPeople Boolean
-  lookingForHouse Boolean
+  lookingForHouse  Boolean
+
+  role String @default("user")
 
   tokens UserToken[]
 
@@ -85,10 +87,9 @@ model UserToken {
   idUserToken Int @id @default(autoincrement())
   userIdToken Int //foreign key to User model, there can be multiple tokens for one user
 
-  token          String
-  expirationDate DateTime
+  token String @unique
 
-  user User @relation(fields: [userIdToken], references: [idUser])
+  user User @relation(fields: [userIdToken], references: [idUser], onDelete: Cascade)
 }
 
 /**

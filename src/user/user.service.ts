@@ -9,12 +9,12 @@ import { PrismaService } from 'src/prisma.service';
 export class UserService {
   constructor(private readonly db: PrismaService) {}
 
-  //create a new user
-  create(createUserDto: CreateUserDto) {
+  //create a new user with hashed password
+  async create(createUserDto: CreateUserDto) {
     const newUser = {
       ...createUserDto,
       role: 'user',
-      password: await argon2.hash(createUserDto.password),
+      password: await argon2.hash(createUserDto.password), //securely hash the password before storing
     };
     return await this.db.user.create({
       data: newUser,
@@ -26,26 +26,19 @@ export class UserService {
 
   async createToken(id: number) {
     const newToken = crypto.randomBytes(32).toString('hex');
-    await this.db.token.create({
+    await this.db.userToken.create({
       data: {
         token: newToken,
         user: {
-          connect: { id },
+          connect: { idUser: id },
         },
       },
     });
     return newToken;
   }
 
-  Login(email: string, password: string) {
-    return this.db.user.findUnique({
-      where: { email: email, password: password },
-      select: {
-        idUser: true,
-        email: true,
-        password: true,
-      },
-    });
+  findByEmail(email: string) {
+    return this.db.user.findUnique({ where: { email: email } });
   }
 
   //get one user by id with necessary data

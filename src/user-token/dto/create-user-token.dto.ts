@@ -9,7 +9,4 @@ export class CreateUserTokenDto {
   @IsNotEmpty()
   @IsString()
   token: string
-  @IsNotEmpty()
-  @IsDate()
-  expirationDate: Date
 }

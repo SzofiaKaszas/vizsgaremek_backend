@@ -26,10 +26,12 @@ async function main() {
           
           password: faker.internet.password(),
           email:faker.internet.email(),
-
+          
           hasHouse: faker.datatype.boolean(),
           lookingForPeople: faker.datatype.boolean(),
           lookingForHouse: faker.datatype.boolean(),
+
+          role: "user",
 
           //optional
           userBio: faker.person.bio(),
@@ -50,8 +52,6 @@ async function main() {
         data:{
           userIdToken: faker.helpers.arrayElement(userIds),
           token: faker.string.uuid(),
-          expirationDate: faker.date.future(),
-
         }
       })
     }
