@@ -26,6 +26,13 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Get('getid')
+  @UseGuards(AuthGuard('bearer'))
+  getUserId(@Request() request) {
+    const user = request.user as User;
+    return { idUser: user.idUser };
+  }
+
   @Get('me')
   @UseGuards(AuthGuard('bearer'))
   getCurrentUser(@Request() request) {
