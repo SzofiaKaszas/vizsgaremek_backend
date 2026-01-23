@@ -25,7 +25,7 @@ export class UserService {
   }
 
   async createToken(id: number) {
-    const newToken = crypto.randomBytes(32).toString('hex');
+    const newToken = crypto.randomBytes(32).toString('hex'); //generate a secure random token
     await this.db.userToken.create({
       data: {
         token: newToken,
@@ -37,6 +37,7 @@ export class UserService {
     return newToken;
   }
 
+  //find user by email
   findByEmail(email: string) {
     return this.db.user.findUnique({ where: { email: email } });
   }
