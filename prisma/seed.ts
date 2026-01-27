@@ -9,6 +9,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 const prisma = new PrismaClient()
 
+//TODO: added new tables seeding
 async function main() {
   await prisma.$transaction(async tx =>{
     

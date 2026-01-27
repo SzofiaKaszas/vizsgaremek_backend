@@ -73,12 +73,10 @@ model User {
 
   roommatesPrefrences RoommatesPrefrences?
   houses              HouseListing[]
-  houseSearchPrefrenc HouseSearchPrefrences?
-  /**
-   * likedRoommates LikedRoommate[] @relation("UserLikes")
-   * likedBy        LikedRoommate[] @relation("UserLikedBy")
-   * likedHouses LikedHouse[]
-   */
+  houseSearchPrefrences HouseSearchPrefrences?
+  likedRoommates      LikedRoommate[]        @relation("UserLikes")
+  likedBy             LikedRoommate[]        @relation("UserLikedBy")
+  likedHouses         LikedHouse[]
 }
 
 //UserToken Model to store user authentication tokens (done)
@@ -104,18 +102,17 @@ model UserToken {
  * }
  */
 
-/**
- * //LikedRoommate Model to store which users liked which other users
- * model LikedRoommate {
- * id Int @id @default(autoincrement())
- * likerId Int
- * likedUserId Int
- * createdAt DateTime @default(now())
- * liker User @relation("UserLikes", fields: [likerId], references: [idUser], onDelete: Cascade)
- * liked User @relation("UserLikedBy", fields: [likedUserId], references: [idUser], onDelete: Cascade)
- * @@unique([likerId, likedUserId])
- * }
- */
+//LikedRoommate Model to store which users liked which other users
+model LikedRoommate {
+  id          Int      @id @default(autoincrement())
+  likerId     Int
+  likedUserId Int
+  createdAt   DateTime @default(now())
+  liker       User     @relation("UserLikes", fields: [likerId], references: [idUser], onDelete: Cascade)
+  liked       User     @relation("UserLikedBy", fields: [likedUserId], references: [idUser], onDelete: Cascade)
+
+  @@unique([likerId, likedUserId])
+}
 
 //RoommatesPrefrences Model to store user prefrences for roommates (maybe add more fields later)
 //***RoommatesPrefrences tables API is src/roommates-prefrences***
@@ -155,7 +152,7 @@ model HouseListing {
   user User? @relation(fields: [houseIdUser], references: [idUser]) //relation to User model but not everyone has a listing
 
   //images HouseImage[]
-  //likedBy LikedHouse[]
+  likedBy LikedHouse[]
 }
 
 /**
@@ -190,15 +187,14 @@ model HouseSearchPrefrences {
   user User? @relation(fields: [houseSearchIdUser], references: [idUser]) //relation to User model but not everyone is looking for houses
 }
 
-/**
- * //LikedHouse Model to store which users liked which house listings
- * model LikedHouse {
- * id Int @id @default(autoincrement())
- * userId Int
- * houseId Int
- * createdAt DateTime @default(now())
- * user User @relation(fields: [userId], references: [idUser], onDelete: Cascade)
- * house HouseListing @relation(fields: [houseId], references: [idHouse], onDelete: Cascade)
- * @@unique([userId, houseId])
- * }
- */
+//LikedHouse Model to store which users liked which house listings
+model LikedHouse {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  houseId   Int
+  createdAt DateTime     @default(now())
+  user      User         @relation(fields: [userId], references: [idUser], onDelete: Cascade)
+  house     HouseListing @relation(fields: [houseId], references: [idHouse], onDelete: Cascade)
+
+  @@unique([userId, houseId])
+}
