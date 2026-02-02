@@ -130,6 +130,12 @@ export class CreateUserDto {
   @IsBoolean()
   lookingForHouse: boolean;
 
+
+  /**
+   * Role of the user
+   * 
+   * @example "user"
+   */
   @IsNotEmpty()
   @IsString()
   role: string
