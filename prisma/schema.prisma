@@ -57,7 +57,7 @@ model User {
 
   //optional fields if you are looking for roommates
   userBio         String?
-  age             Int?
+  age             Int? //Change to birthdate
   gender          String? //maybe enum later
   language        String?
   occupation      String?

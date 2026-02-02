@@ -4,6 +4,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsOptional,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   IsPhoneNumber,
   IsPositive,
   IsString,
@@ -128,4 +129,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsBoolean()
   lookingForHouse: boolean;
+
+  @IsNotEmpty()
+  @IsString()
+  role: string
 }
