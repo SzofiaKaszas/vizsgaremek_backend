@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import {
   FurnishingLevel,
   HeatingType,
@@ -7,7 +7,7 @@ import {
 } from 'generated/prisma/enums';
 
 export class CreateHouseSearchPrefrenceDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   houseSearchIdUser: number;
 
