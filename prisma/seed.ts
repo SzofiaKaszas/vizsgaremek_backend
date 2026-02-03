@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -5,6 +6,7 @@
 import { PrismaClient} from "../generated/prisma/client"
 import { faker } from '@faker-js/faker'
 import dotenv from 'dotenv'
+import * as argon2 from 'argon2';
 
 import { FurnishingLevel,HeatingType,KitchenLevel,PropertyType } from "../generated/prisma/enums"
 
@@ -26,6 +28,22 @@ async function main() {
     const houseListingIds: number [] = []
     const houseCitys: string [] = []
 
+    //Admin
+    const xAdmin = await tx.user.create({
+      data:{
+        firstName: "admin",
+        lastName: "admin",
+        phoneNumber: "00000000000",
+        password: await argon2.hash("admin"),
+        email: "admin@admin.admin",
+        hasHouse: false,
+        lookingForPeople: false,
+        lookingForHouse: false,
+        role: "admin"
+
+      }
+    })
+
 
     //User
     for (let i = 0; i < generateUserCount ; i++){
@@ -36,7 +54,7 @@ async function main() {
           
           phoneNumber: faker.phone.number(),
           
-          password: faker.internet.password(),
+          password: await argon2.hash(faker.internet.password()),
           email:faker.internet.email(),
           
           hasHouse: faker.datatype.boolean(),
@@ -106,7 +124,7 @@ async function main() {
           
           user: {connect: {idUser: faker.helpers.arrayElement(userIds)} },
 
-          description: faker.lorem.paragraphs({min:1, max:3}), //Not the best fake data, but couldnt find better
+          description: faker.person.bio(), //Not the best fake data, but couldnt find better
           location: faker.location.streetAddress(true),
           city:faker.location.city(),
           rent:faker.number.int({min:10000, max:500000}),

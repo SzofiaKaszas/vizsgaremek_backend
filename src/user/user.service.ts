@@ -11,6 +11,7 @@ export class UserService {
 
   //create a new user with hashed password
   async create(createUserDto: CreateUserDto) {
+    
     const newUser = {
       ...createUserDto,
       role: 'user',
