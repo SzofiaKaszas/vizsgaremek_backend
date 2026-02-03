@@ -7,7 +7,7 @@ import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dt
 export class RoommatesPrefrencesController {
   constructor(private readonly roommatesPrefrencesService: RoommatesPrefrencesService) {}
 
-  @Post()
+  @Post("add")
   create(@Body() createRoommatesPrefrenceDto: CreateRoommatesPrefrenceDto) {
     return this.roommatesPrefrencesService.create(createRoommatesPrefrenceDto);
   }
