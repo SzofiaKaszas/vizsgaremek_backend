@@ -7,7 +7,7 @@ import { UpdateHouseSearchPrefrenceDto } from './dto/update-house-search-prefren
 export class HouseSearchPrefrencesController {
   constructor(private readonly houseSearchPrefrencesService: HouseSearchPrefrencesService) {}
 
-  @Post()
+  @Post("add")
   create(@Body() createHouseSearchPrefrenceDto: CreateHouseSearchPrefrenceDto) {
     return this.houseSearchPrefrencesService.create(createHouseSearchPrefrenceDto);
   }
