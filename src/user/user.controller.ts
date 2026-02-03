@@ -15,6 +15,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'generated/prisma/client';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -27,6 +28,7 @@ export class UserController {
   }
 
   @Get('getid')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   getUserId(@Request() request) {
     const user = request.user as User;
@@ -34,6 +36,7 @@ export class UserController {
   }
 
   @Get('me')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   getCurrentUser(@Request() request) {
     return request.user as User;
@@ -59,6 +62,7 @@ export class UserController {
 
   //update user by id
   @Patch(':id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   update(
     @Param('id') id: string,

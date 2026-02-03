@@ -4,6 +4,8 @@ import * as crypto from 'node:crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
+import { Prisma } from 'generated/prisma/client';
+
 
 @Injectable()
 export class UserService {
@@ -11,18 +13,27 @@ export class UserService {
 
   //create a new user with hashed password
   async create(createUserDto: CreateUserDto) {
-    
-    const newUser = {
-      ...createUserDto,
-      role: 'user',
-      password: await argon2.hash(createUserDto.password), //securely hash the password before storing
-    };
-    return await this.db.user.create({
-      data: newUser,
-      omit: {
-        password: true,
-      },
-    });
+    try{
+      const newUser = {
+        ...createUserDto,
+        role: 'user',
+        password: await argon2.hash(createUserDto.password), //securely hash the password before storing
+      };
+      return await this.db.user.create({
+        data: newUser,
+        omit: {
+          password: true,
+        },
+      });
+
+    }catch(error){
+      if(error instanceof Prisma.PrismaClientKnownRequestError){
+        switch(error.code){
+          
+        }
+      }
+      throw error;
+    }
   }
 
   async createToken(id: number) {
