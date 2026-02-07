@@ -44,6 +44,70 @@ async function main() {
       }
     })
 
+    //Test Users for testing the matching algorithm, they have fixed preferences and attributes to ensure matches
+    const testUser1 = await tx.user.create({
+      data:{
+        firstName: "test01",
+        lastName: "test01",
+        phoneNumber: "00000000001",
+        password: await argon2.hash("test01"),
+        email: "t01@t01.t01",
+        hasHouse: false,
+        lookingForPeople: true,
+        lookingForHouse: false,
+        role: "user",
+        userBio: "I am test user 1, looking for roommates.",
+        age: 25,
+        gender: "male",
+      }
+    });
+    const testUser1Token = await tx.userToken.create({
+      data:{
+        user: {connect: {idUser: testUser1.idUser} },
+        token: "test01token",
+      }
+    })
+    const testUser1Preferences = await tx.roommatesPrefrences.create({
+      data:{
+        user: {connect: {idUser: testUser1.idUser} },
+        minAge: 20,
+        maxAge: 30,
+        gender: "male",
+        language: "English"
+      }
+    })
+    const testUser2 = await tx.user.create({
+      data:{
+        firstName: "test02",
+        lastName: "test02",
+        phoneNumber: "00000000002",
+        password: await argon2.hash("test02"),
+        email: "t02@t02.t02",
+        hasHouse: false,
+        lookingForPeople: true,
+        lookingForHouse: false,
+        role: "user",
+        userBio: "I am test user 2, looking for roommates.",
+        age: 24,
+        gender: "male",
+      }
+    });
+    const testUser2Token = await tx.userToken.create({
+      data:{
+        user: {connect: {idUser: testUser2.idUser} },
+        token: "test02token",
+      }
+    })
+    const testUser2Preferences = await tx.roommatesPrefrences.create({
+      data:{
+        user: {connect: {idUser: testUser2.idUser} },
+        minAge: 20,
+        maxAge: 30,
+        gender: "male",
+        language: "English"
+      }
+    })
+
 
     //User
     for (let i = 0; i < generateUserCount ; i++){
