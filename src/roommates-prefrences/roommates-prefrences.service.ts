@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { CreateRoommatesPrefrenceDto } from './dto/create-roommates-prefrence.dto';
 import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dto';
 import { PrismaService } from 'src/prisma.service';
+import { User, RoommatesPrefrences } from 'generated/prisma/client';
+import { roommateScoringPercentige } from './roommate-scoring';
+
 
 @Injectable()
 export class RoommatesPrefrencesService {
@@ -11,6 +14,44 @@ export class RoommatesPrefrencesService {
     return this.db.roommatesPrefrences.create({
       data: createRoommatesPrefrenceDto,
     });
+  }
+
+  async getMatchesTest(id: number) {
+    const userPreferences = await this.db.roommatesPrefrences.findUnique({
+      where: { roommatesPrefrencesIdUser: id },
+    }) as RoommatesPrefrences;
+    console.log(userPreferences)
+    if (!userPreferences) {
+      return [];
+    }
+    console.log(await this.db.user.findFirst({
+      where: { firstName: "test02" },
+    }))
+    const matches = await this.db.user.findMany({
+      omit: {password: true},
+      where: {
+        idUser: { not: id},
+        role: "user",
+        lookingForPeople: true,
+        age: {
+          gte: userPreferences.minAge ? userPreferences.minAge : undefined,
+          lte: userPreferences.maxAge ? userPreferences.maxAge : undefined,
+        },
+        gender: userPreferences.gender,
+        OR: [
+          {language: userPreferences.language},
+          {language: null}, //match users with no language preference
+        ]
+
+        
+      }
+    }) as User[];
+    return matches;
+  }
+
+  getMatches(id: number) {
+    
+    return [];
   }
 
   findAll() {

@@ -1,7 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { RoommatesPrefrencesService } from './roommates-prefrences.service';
 import { CreateRoommatesPrefrenceDto } from './dto/create-roommates-prefrence.dto';
 import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from 'generated/prisma/client';
 
 @Controller('roommates-prefrences')
 export class RoommatesPrefrencesController {
@@ -12,9 +15,22 @@ export class RoommatesPrefrencesController {
     return this.roommatesPrefrencesService.create(createRoommatesPrefrenceDto);
   }
 
+
+
   @Get()
   findAll() {
     return this.roommatesPrefrencesService.findAll();
+  }
+
+  @Get('getmatches')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  async getMatches(@Request() request) {
+    const user = request.user as User;
+    console.log("------------------")
+    console.log(user)
+    const matches : User[] =  await this.roommatesPrefrencesService.getMatchesTest(user.idUser);
+    return matches;
   }
 
   @Get(':id')
