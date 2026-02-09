@@ -49,8 +49,20 @@ export class RoommatesPrefrencesService {
     return matches;
   }
 
-  getMatches(id: number) {
-    
+  async getMatches(id: number) {
+    const userPrefrenc = await this.db.roommatesPrefrences.findUnique({
+      where:{roommatesPrefrencesIdUser : id},
+      include: {user: true}
+    })
+    const users  = await this.db.user.findMany({
+      where:{
+        idUser: {not: id}
+      },
+      include: {roommatesPrefrences: true}
+    })
+    users.map(()=>{
+      const userPrefToMatch : number = roommateScoringPercentige(userPrefrenc.)
+    })
     return [];
   }
 
