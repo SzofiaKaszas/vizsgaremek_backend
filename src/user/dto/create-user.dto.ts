@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import {
   IsBoolean,
   IsEmail,
@@ -8,6 +9,7 @@ import {
   IsPhoneNumber,
   IsPositive,
   IsString,
+  Matches,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -31,9 +33,10 @@ export class CreateUserDto {
    * Phone number of the user. Store in E.164 format when possible.
    * @example "+1234567890"
    */
+  //@IsPhoneNumber() //validate phone number format, not sure if it works for all countries
   @IsNotEmpty()
   @IsString()
-  //@IsPhoneNumber() //validate phone number format, not sure if it works for all countries
+  @Matches(/^\+?\d{1,3}[-\s\.]?\(?\d{2,3}\)?[-\s\.]?\d{3}[-\s\.]?\d{4,6}$/)
   phoneNumber: string;
 
   /**

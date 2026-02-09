@@ -5,8 +5,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from 'generated/prisma/client';
+import { PrismaClientKnownRequestError } from 'generated/prisma/internal/prismaNamespace';
 
-
+/**
+ * The user handler class
+ */
 @Injectable()
 export class UserService {
   constructor(private readonly db: PrismaService) {}
@@ -27,26 +30,46 @@ export class UserService {
       });
 
     }catch(error){
-      if(error instanceof Prisma.PrismaClientKnownRequestError){
-        switch(error.code){
-          
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2002':
+            console.error('Duplicate entry detected:', error.meta?.target);
+            break;
+          case 'P2025':
+            console.error('Record not found:', error.meta?.cause);
+            break;
+          default:
+            console.error('Prisma error:', error.message);
         }
       }
-      throw error;
+      
     }
   }
 
+  /**
+   * Creates a new token for the user and returns it
+   * 
+   * @param id User's id
+   * @throws {PrismaClientKnownRequestError}
+   * @returns Returns a new token for the user, or Error if failed to save it to database
+   */
   async createToken(id: number) {
-    const newToken = crypto.randomBytes(32).toString('hex'); //generate a secure random token
-    await this.db.userToken.create({
-      data: {
-        token: newToken,
-        user: {
-          connect: { idUser: id },
+    try{
+      const newToken = crypto.randomBytes(32).toString('hex'); //generate a secure random token
+      await this.db.userToken.create({
+        data: {
+          token: newToken,
+          user: {
+            connect: { idUser: id },
+          },
         },
-      },
-    });
-    return newToken;
+      });
+      
+     return newToken
+
+    }catch(err){
+      return err as PrismaClientKnownRequestError
+    }
   }
 
   //find user by email
