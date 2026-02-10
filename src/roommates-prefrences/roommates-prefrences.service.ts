@@ -49,6 +49,7 @@ export class RoommatesPrefrencesService {
     return matches;
   }
 
+  //TODO: Remake the function to be more readable and efficent
   async getMatches(id: number) {
     /*const userPrefrenc = await this.db.roommatesPrefrences.findUnique({
       where:{roommatesPrefrencesIdUser : id},
