@@ -17,6 +17,7 @@ export class RoommatesPrefrencesService {
   }
 
   async getMatchesTest(id: number) {
+    
     const userPreferences = await this.db.roommatesPrefrences.findUnique({
       where: { roommatesPrefrencesIdUser: id },
     }) as RoommatesPrefrences;
@@ -51,10 +52,8 @@ export class RoommatesPrefrencesService {
 
   //TODO: Remake the function to be more readable and efficent
   async getMatches(id: number) {
-    /*const userPrefrenc = await this.db.roommatesPrefrences.findUnique({
-      where:{roommatesPrefrencesIdUser : id},
-      include: {user: true}
-    })*/
+    const balanceMatchScores = 0.7 //The wheight to adjust how much the user's prefrenc matters compared to the potentilaMatches's prefrence (0 to 1)
+    
     const userToMatchRaw = await this.db.user.findUnique({
       where: { idUser: id },
       include: { roommatesPrefrences: true },
@@ -79,7 +78,7 @@ export class RoommatesPrefrencesService {
         const candidate = u as unknown as UserPlusPrefrenc;
         const scoreA = roommateScoringPercentige(userToMatch, candidate); // user -> candidate
         const scoreB = roommateScoringPercentige(candidate, userToMatch); // candidate -> user
-        const total = scoreA + scoreB;
+        const total = scoreA * balanceMatchScores + scoreB * (1-balanceMatchScores);
         return { user: u, score: total };
       })
       .sort((a, b) => b.score - a.score);
