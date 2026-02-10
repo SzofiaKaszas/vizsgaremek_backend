@@ -59,6 +59,7 @@ async function main() {
         userBio: "I am test user 1, looking for roommates.",
         age: 25,
         gender: "male",
+        language: "English"
       }
     });
     const testUser1Token = await tx.userToken.create({
@@ -90,6 +91,7 @@ async function main() {
         userBio: "I am test user 2, looking for roommates.",
         age: 24,
         gender: "male",
+        language: "English"
       }
     });
     const testUser2Token = await tx.userToken.create({
