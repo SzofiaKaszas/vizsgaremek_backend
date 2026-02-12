@@ -15,8 +15,6 @@ export class RoommatesPrefrencesController {
     return this.roommatesPrefrencesService.create(createRoommatesPrefrenceDto);
   }
 
-
-
   @Get()
   findAll() {
     return this.roommatesPrefrencesService.findAll();
@@ -34,6 +32,7 @@ export class RoommatesPrefrencesController {
     return matches;
   }
 
+  /*TODO: get pref by token/users id*/
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.roommatesPrefrencesService.findOne(+id);
