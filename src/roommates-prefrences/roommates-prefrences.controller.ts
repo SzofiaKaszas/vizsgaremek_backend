@@ -26,10 +26,11 @@ export class RoommatesPrefrencesController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   async getMatches(@Request() request) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const user = request.user as User;
-    console.log("------------------")
-    console.log(user)
-    const matches : User[] =  await this.roommatesPrefrencesService.getMatchesTest(user.idUser);
+    //console.log("------------------")
+    //console.log(user)
+    const matches : User[] =  await this.roommatesPrefrencesService.getMatches(user.idUser);
     return matches;
   }
 

@@ -1,6 +1,17 @@
 import { User, RoommatesPrefrences } from 'generated/prisma/client';
 
-function roommateScoringPercentige(preferences: RoommatesPrefrences, potentialMatch: User): number {
+interface UserPlusPrefrenc extends User{
+  roommatesPrefrences: RoommatesPrefrences
+}
+
+/**
+ * Scores potentialMatch acording to prefrenc's defined prefrences
+ * 
+ * @param preferences A User type extended with RoommatesPrefrences
+ * @param potentialMatch A User type extended with RoommatesPrefrences
+ * @returns The scored matching in percentage
+ */
+function roommateScoringPercentige(preferences: UserPlusPrefrenc, potentialMatch: UserPlusPrefrenc): number {
     let score = 0;
     let max = 0;
 
@@ -39,14 +50,14 @@ function roommateScoringPercentige(preferences: RoommatesPrefrences, potentialMa
 
     //Age scoring
     max += W_AGE;
-    if (!preferences.minAge && !preferences.maxAge) {
+    if (!preferences.roommatesPrefrences.minAge && !preferences.roommatesPrefrences.maxAge) {
         score += W_AGE; //if no age preference
     }
     else if (!potentialMatch.age) {
         score += W_AGE * unknownAgeMultiplier; //if potential match has no age
     }
     //TODO: consider giving more points for being close to the preferred age range, and less points the further away they are
-    else if (!(preferences.minAge && potentialMatch.age > preferences.minAge) || !(preferences.maxAge && potentialMatch.age < preferences.maxAge)) {
+    else if (!(preferences.roommatesPrefrences.minAge && potentialMatch.age > preferences.roommatesPrefrences.minAge) || !(preferences.roommatesPrefrences.maxAge && potentialMatch.age < preferences.roommatesPrefrences.maxAge)) {
         score += W_AGE * ageDifferencePenalty 
     }
     else {
@@ -76,4 +87,4 @@ function roommateScoringPercentige(preferences: RoommatesPrefrences, potentialMa
     return Math.round((score / max )*100); 
 }
 
-export {roommateScoringPercentige}
+export {roommateScoringPercentige, type UserPlusPrefrenc}
