@@ -81,6 +81,7 @@ model User {
 
 //UserToken Model to store user authentication tokens (done)
 //***UserToken tables API is src/user-token***
+//TODO: Add expiration date
 model UserToken {
   idUserToken Int @id @default(autoincrement())
   userIdToken Int //foreign key to User model, there can be multiple tokens for one user

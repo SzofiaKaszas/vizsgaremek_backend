@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import * as crypto from 'node:crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from 'generated/prisma/client';
-import { PrismaClientKnownRequestError } from 'generated/prisma/internal/prismaNamespace';
 
 /**
  * The user handler class
@@ -14,7 +13,34 @@ import { PrismaClientKnownRequestError } from 'generated/prisma/internal/prismaN
 export class UserService {
   constructor(private readonly db: PrismaService) {}
 
+  private handlePrismaError(error: unknown): never {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case 'P2002':
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          throw new ConflictException(`User with this ${error.meta?.target} already exists`);
+        case 'P2025':
+          throw new NotFoundException('User not found');
+        case 'P2003':
+          throw new BadRequestException('Invalid reference provided');
+        default:
+          throw new InternalServerErrorException('Database operation failed');
+      }
+    }
+    throw new InternalServerErrorException('An unexpected error occurred');
+  }
+
   //create a new user with hashed password
+  /**
+   * Creates new user
+   * 
+   * @throws {ConflictException} User with same unique data already exists 
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} How?
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @param createUserDto  
+   * @returns Created user data with out password
+   */
   async create(createUserDto: CreateUserDto) {
     try{
       const newUser = {
@@ -30,18 +56,7 @@ export class UserService {
       });
 
     }catch(error){
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        switch (error.code) {
-          case 'P2002':
-            console.error('Duplicate entry detected:', error.meta?.target);
-            break;
-          case 'P2025':
-            console.error('Record not found:', error.meta?.cause);
-            break;
-          default:
-            console.error('Prisma error:', error.message);
-        }
-      }
+      this.handlePrismaError(error)
       
     }
   }
@@ -67,50 +82,79 @@ export class UserService {
       
      return newToken
 
-    }catch(err){
-      return err as PrismaClientKnownRequestError
+    }catch(error){
+      this.handlePrismaError(error)
+      
     }
   }
 
   //find user by email
-  findByEmail(email: string) {
-    return this.db.user.findUnique({ where: { email: email } });
+  async findByEmail(email: string) {
+    try{
+      return await this.db.user.findUniqueOrThrow({ where: { email: email } });
+
+    }catch(error){
+      this.handlePrismaError(error)
+      
+    }
   }
 
   //get one user by id with necessary data
-  getNecessary(id: number) {
-    return this.db.user.findUnique({
-      where: { idUser: id },
-      select: {
-        idUser: true,
-        firstName: true,
-        lastName: true,
-        connectionEmail: true,
-        phoneNumber: true,
-      },
-    });
+  async getNecessary(id: number) {
+    try{
+      return await this.db.user.findUniqueOrThrow({
+        where: { idUser: id },
+        select: {
+          idUser: true,
+          firstName: true,
+          lastName: true,
+          connectionEmail: true,
+          phoneNumber: true,
+        },
+      });
+
+    }catch(error){
+      this.handlePrismaError(error)
+      
+    }
   }
 
   //get one user by id and all data
-  findOne(id: number) {
-    return this.db.user.findUnique({ where: { idUser: id } });
+  async findOne(id: number) {
+    try{
+      return await this.db.user.findUniqueOrThrow({ where: { idUser: id }, omit:{password: true} });
+    }catch(error){
+      this.handlePrismaError(error) 
+    }
   }
 
   //get all users and all data
-  findAll() {
-    return this.db.user.findMany();
+  async findAll() {
+    try{
+      return await this.db.user.findMany();
+    }catch(error){
+      this.handlePrismaError(error) 
+    }
   }
 
   //update user by id
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.db.user.update({
-      where: { idUser: id },
-      data: updateUserDto,
-    });
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try{
+      return await this.db.user.update({
+        where: { idUser: id },
+        data: updateUserDto,
+      });
+    }catch(error){
+      this.handlePrismaError(error) 
+    }
   }
 
   //delete user by id
-  remove(id: number) {
-    return this.db.user.delete({ where: { idUser: id } });
+  async remove(id: number) {
+    try{
+      return await this.db.user.delete({ where: { idUser: id } });
+    }catch(error){
+      this.handlePrismaError(error) 
+    }
   }
 }
