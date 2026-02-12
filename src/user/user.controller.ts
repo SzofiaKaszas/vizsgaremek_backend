@@ -157,7 +157,8 @@ export class UserController {
   @Get()
   @ApiOkResponse({
     description: 'Returns data of user on id',
-    type: UserBaseDto
+    type: UserBaseDto,
+    isArray: true
   })
   @ApiInternalServerErrorResponse({
     description: 'Database operation failed'
