@@ -36,7 +36,7 @@ export class UserService {
    * 
    * @throws {ConflictException} User with same unique data already exists 
    * @throws {BadRequestException} Bad request
-   * @throws {NotFoundException} How?
+   * @throws {NotFoundException} User not found
    * @throws {InternalServerErrorException} Database opperation failed
    * @param createUserDto  
    * @returns Created user data with out password
@@ -65,7 +65,10 @@ export class UserService {
    * Creates a new token for the user and returns it
    * 
    * @param id User's id
-   * @throws {PrismaClientKnownRequestError}
+   * @throws {ConflictException} User with same unique data already exists 
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} User not found
+   * @throws {InternalServerErrorException} Database opperation failed
    * @returns Returns a new token for the user, or Error if failed to save it to database
    */
   async createToken(id: number) {
@@ -88,7 +91,15 @@ export class UserService {
     }
   }
 
-  //find user by email
+  /**
+   * Finds a user by their email address
+   * 
+   * @param email User's email address
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} User not found
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @returns the user record associated with the email, or null if not found
+   */
   async findByEmail(email: string) {
     try{
       return await this.db.user.findUniqueOrThrow({ where: { email: email } });
@@ -99,7 +110,16 @@ export class UserService {
     }
   }
 
-  //get one user by id with necessary data
+  
+  /**
+   * get one user by id with necessary data
+   * 
+   * @param id User's id
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} User not found
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @returns the user record with only necessary data
+   */
   async getNecessary(id: number) {
     try{
       return await this.db.user.findUniqueOrThrow({
@@ -120,6 +140,15 @@ export class UserService {
   }
 
   //get one user by id and all data
+  /**
+   * get one user by id and all data
+   * 
+   * @param id User's id
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} User not found
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @returns user record with all data except password
+   */
   async findOne(id: number) {
     try{
       return await this.db.user.findUniqueOrThrow({ where: { idUser: id }, omit:{password: true} });
@@ -128,18 +157,38 @@ export class UserService {
     }
   }
 
-  //get all users and all data
+  /**
+   * get all users and all data
+   * 
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} User not found
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @returns returns an array of all user records with all data except password
+   */
   async findAll() {
     try{
-      return await this.db.user.findMany();
+      return await this.db.user.findMany({ omit:{password: true} });
     }catch(error){
       this.handlePrismaError(error) 
     }
   }
 
-  //update user by id
+  
+  /**
+   * update user by id
+   * @param id 
+   * @param updateUserDto 
+   * @throws {ConflictException} User with same unique data already exists 
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} User not found
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @returns Updated user
+   */
   async update(id: number, updateUserDto: UpdateUserDto) {
     try{
+      if(updateUserDto.password){
+        updateUserDto.password = await argon2.hash(updateUserDto.password)
+      }
       return await this.db.user.update({
         where: { idUser: id },
         data: updateUserDto,
@@ -149,7 +198,15 @@ export class UserService {
     }
   }
 
-  //delete user by id
+  /**
+   * delete user by id
+   * 
+   * @param id User's id
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} User not found
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @returns Deleted user record
+   */
   async remove(id: number) {
     try{
       return await this.db.user.delete({ where: { idUser: id } });

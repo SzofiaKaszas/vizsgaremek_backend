@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Controller,
   Get,
@@ -7,6 +8,9 @@ import {
   Param,
   Delete,
   ForbiddenException,
+  UseGuards,
+  Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { UserTokenService } from './user-token.service';
@@ -14,6 +18,7 @@ import { UpdateUserTokenDto } from './dto/update-user-token.dto';
 import { UserService } from 'src/user/user.service';
 import { LoginDto } from './dto/login.dto';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiExtraModels,
@@ -22,6 +27,8 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { CreateUserTokenDto } from './dto/create-user-token.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from 'generated/prisma/client';
 
 /**
  * Controller for managing user tokens
@@ -75,12 +82,18 @@ export class UserTokenController {
    * Gets all user tokens
    *
    * @returns an array of all user token records
-   *
-   * TODO: authenticate so only admin user can do this
    */
   @ApiOkResponse({ description: 'Ok. Returns all tokens' })
   @Get()
-  findAll() {
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  findAll(
+    @Request() request
+  ) {
+    const user = request.user as User
+    if(user.role != 'admin'){
+      throw new UnauthorizedException('Acces unauthorized')
+    }
     return this.userTokenService.findAll();
   }
 
@@ -93,7 +106,13 @@ export class UserTokenController {
   @ApiParam({ name: 'id', description: 'id of the token updated', example: 25 })
   @ApiOkResponse({ description: 'Ok. Returns one token by its id' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  findOne(@Param('id') id: string, @Request() request) {
+    const user = request.user as User
+    if(user.role != 'admin'){
+      throw new UnauthorizedException('Acces unauthorized')
+    }
     return this.userTokenService.findOne(+id);
   }
 

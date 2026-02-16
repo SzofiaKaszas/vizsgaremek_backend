@@ -210,7 +210,7 @@ export class UserController {
     @Request() request,
   ) {
     const user = request.user as User;
-    if (user.idUser == id || user.role === 'admin') {
+    if (user.idUser === id || user.role === 'admin') {
       return this.userService.update(id, updateUserDto);
     } else {
       throw new UnauthorizedException("Cannot modify other users' data");
@@ -253,7 +253,7 @@ export class UserController {
     @Request() request
   ) {
     const user = request.user as User;
-    if (user.idUser == id || user.role === 'admin') {
+    if (user.idUser === id || user.role === 'admin') {
       return this.userService.remove(id);
     }else {
       throw new UnauthorizedException("Unauthorized to delete other user");
