@@ -147,9 +147,12 @@ export class UserTokenController {
     type: CreateUserTokenDto,
   })
   @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
   update(
     @Param('id') id: string,
     @Body() updateUserTokenDto: UpdateUserTokenDto,
+    @Request() request
   ) {
     return this.userTokenService.update(+id, updateUserTokenDto);
   }
@@ -166,7 +169,9 @@ export class UserTokenController {
     type: CreateUserTokenDto,
   })
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  remove(@Param('id') id: string,@Request() request) {
     return this.userTokenService.remove(+id);
   }
 }
