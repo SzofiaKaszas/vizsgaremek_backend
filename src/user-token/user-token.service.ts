@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateUserTokenDto } from './dto/create-user-token.dto';
 import { UpdateUserTokenDto } from './dto/update-user-token.dto';
 import { PrismaService } from 'src/prisma.service';
+import { Prisma } from 'generated/prisma/client';
+//import { Prisma } from '@prisma/client';
 
 /**
  * Service for managing user tokens.
@@ -12,6 +14,23 @@ import { PrismaService } from 'src/prisma.service';
 export class UserTokenService {
   constructor(private readonly db: PrismaService) {}
 
+  private handlePrismaError(error: unknown): never {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (error.code) {
+          case 'P2002':
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            throw new ConflictException(`User with this ${error.meta?.target} already exists`);
+          case 'P2025':
+            throw new NotFoundException('User not found');
+          case 'P2003':
+            throw new BadRequestException('Invalid reference provided');
+          default:
+            throw new InternalServerErrorException('Database operation failed');
+        }
+      }
+      throw new InternalServerErrorException('An unexpected error occurred');
+    }
+
   /**
    * Creates a new user token
    * 
@@ -19,9 +38,13 @@ export class UserTokenService {
    * @returns the created user token record
    */
   create(createUserTokenDto: CreateUserTokenDto) {
-    return this.db.userToken.create({
-      data: createUserTokenDto,
-    });
+    try{
+      return this.db.userToken.create({
+        data: createUserTokenDto,
+      });
+      }catch(error){
+      this.handlePrismaError(error)
+    }
   }
 
   /**
@@ -30,7 +53,11 @@ export class UserTokenService {
    * @returns an array of all the user tokens
    */
   findAll() {
-    return this.db.userToken.findMany();
+    try{
+      return this.db.userToken.findMany();
+      }catch(error){
+      this.handlePrismaError(error)
+    }
   }
 
   /**
@@ -40,9 +67,13 @@ export class UserTokenService {
    * @returns the user token record associated with the id, or null if not found
    */
   findOne(id: number) {
-    return this.db.userToken.findUnique({
-      where: { idUserToken: id },
-    });
+    try{
+      return this.db.userToken.findUnique({
+        where: { idUserToken: id },
+      });
+      }catch(error){
+      this.handlePrismaError(error)
+    }
   }
 
   /**
@@ -53,10 +84,14 @@ export class UserTokenService {
    * @returns the 
    */
   update(id: number, updateUserTokenDto: UpdateUserTokenDto) {
-    return this.db.userToken.update({
-      where: { idUserToken: id },
-      data: updateUserTokenDto,
-    });
+    try{
+      return this.db.userToken.update({
+        where: { idUserToken: id },
+        data: updateUserTokenDto,
+      });
+      }catch(error){
+      this.handlePrismaError(error)
+    }
   }
 
   /**
@@ -66,8 +101,12 @@ export class UserTokenService {
    * @returns the deleted user token record
    */
   remove(id: number) {
-    return this.db.userToken.delete({
-      where: { idUserToken: id },
-    });
+    try{
+      return this.db.userToken.delete({
+        where: { idUserToken: id },
+      });
+      }catch(error){
+      this.handlePrismaError(error)
+    }
   }
 }
