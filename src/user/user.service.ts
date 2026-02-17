@@ -1,10 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import * as crypto from 'node:crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
-import { Prisma } from 'generated/prisma/client';
+import {handlePrismaError} from '../helperFunctions/helpers'
 
 /**
  * The user handler class
@@ -13,22 +14,6 @@ import { Prisma } from 'generated/prisma/client';
 export class UserService {
   constructor(private readonly db: PrismaService) {}
 
-  private handlePrismaError(error: unknown): never {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case 'P2002':
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          throw new ConflictException(`User with this ${error.meta?.target} already exists`);
-        case 'P2025':
-          throw new NotFoundException('User not found');
-        case 'P2003':
-          throw new BadRequestException('Invalid reference provided');
-        default:
-          throw new InternalServerErrorException('Database operation failed');
-      }
-    }
-    throw new InternalServerErrorException('An unexpected error occurred');
-  }
 
   //create a new user with hashed password
   /**
@@ -56,7 +41,7 @@ export class UserService {
       });
 
     }catch(error){
-      this.handlePrismaError(error)
+      handlePrismaError(error)
       
     }
   }
@@ -86,7 +71,7 @@ export class UserService {
      return newToken
 
     }catch(error){
-      this.handlePrismaError(error)
+      handlePrismaError(error)
       
     }
   }
@@ -105,7 +90,7 @@ export class UserService {
       return await this.db.user.findUniqueOrThrow({ where: { email: email } });
 
     }catch(error){
-      this.handlePrismaError(error)
+      handlePrismaError(error)
       
     }
   }
@@ -134,7 +119,7 @@ export class UserService {
       });
 
     }catch(error){
-      this.handlePrismaError(error)
+      handlePrismaError(error)
       
     }
   }
@@ -153,7 +138,7 @@ export class UserService {
     try{
       return await this.db.user.findUniqueOrThrow({ where: { idUser: id }, omit:{password: true} });
     }catch(error){
-      this.handlePrismaError(error) 
+      handlePrismaError(error) 
     }
   }
 
@@ -169,7 +154,7 @@ export class UserService {
     try{
       return await this.db.user.findMany({ omit:{password: true} });
     }catch(error){
-      this.handlePrismaError(error) 
+      handlePrismaError(error) 
     }
   }
 
@@ -194,7 +179,7 @@ export class UserService {
         data: updateUserDto,
       });
     }catch(error){
-      this.handlePrismaError(error) 
+      handlePrismaError(error) 
     }
   }
 
@@ -211,7 +196,7 @@ export class UserService {
     try{
       return await this.db.user.delete({ where: { idUser: id } });
     }catch(error){
-      this.handlePrismaError(error) 
+      handlePrismaError(error) 
     }
   }
 }

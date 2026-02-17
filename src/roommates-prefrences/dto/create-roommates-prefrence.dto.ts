@@ -1,9 +1,7 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class CreateRoommatesPrefrenceDto {
-  @IsNotEmpty()
-  @IsNumber()
-  roommatesPrefrencesIdUser: number;
+ 
 
   @IsNumber()
   minAge?: number;

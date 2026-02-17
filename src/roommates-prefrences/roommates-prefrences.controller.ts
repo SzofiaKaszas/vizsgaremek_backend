@@ -1,18 +1,30 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { RoommatesPrefrencesService } from './roommates-prefrences.service';
 import { CreateRoommatesPrefrenceDto } from './dto/create-roommates-prefrence.dto';
 import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'generated/prisma/client';
+import { RoommatesPrefrences, User } from 'generated/prisma/client';
 
 @Controller('roommates-prefrences')
 export class RoommatesPrefrencesController {
   constructor(private readonly roommatesPrefrencesService: RoommatesPrefrencesService) {}
 
+  /**
+   * Creates new prefrences for user
+   * @param createRoommatesPrefrenceDto 
+   * @returns {RoommatesPrefrences}
+   */
   @Post("add")
-  create(@Body() createRoommatesPrefrenceDto: CreateRoommatesPrefrenceDto) {
-    return this.roommatesPrefrencesService.create(createRoommatesPrefrenceDto);
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  create(
+    @Body() createRoommatesPrefrenceDto: CreateRoommatesPrefrenceDto,
+    @Request() request
+  ) {
+    const user = request.user as User
+    return this.roommatesPrefrencesService.create(createRoommatesPrefrenceDto, user.idUser);
   }
 
   @Get()
