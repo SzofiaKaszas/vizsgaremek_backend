@@ -62,6 +62,7 @@ export class UserTokenController {
   })
   @ApiCreatedResponse({
     description: 'Successfully logged in. Returns a newly created token.',
+    type: CreateUserTokenDto,
   })
   @ApiForbiddenResponse({ description: 'Invalid email or password' })
   @Post('login')
@@ -83,16 +84,35 @@ export class UserTokenController {
    *
    * @returns an array of all user token records
    */
-  @ApiOkResponse({ description: 'Ok. Returns all tokens' })
+  @ApiOkResponse({
+    description: 'Ok. Returns all tokens in an array',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          userIdToken: {
+            type: 'number',
+            example: 42,
+            description: 'Id of the user whose token this is',
+          },
+          token: {
+            type: 'string',
+            example:
+              'f8bf1a217dde79dad1219f11345ca5ef792d341e556b7c1cf11576274c9a9062',
+            description: 'The token assigned to the user',
+          },
+        },
+      },
+    },
+  })
   @Get()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
-  findAll(
-    @Request() request
-  ) {
-    const user = request.user as User
-    if(user.role != 'admin'){
-      throw new UnauthorizedException('Acces unauthorized')
+  findAll(@Request() request) {
+    const user = request.user as User;
+    if (user.role != 'admin') {
+      throw new UnauthorizedException('Acces unauthorized');
     }
     return this.userTokenService.findAll();
   }
@@ -104,14 +124,14 @@ export class UserTokenController {
    * @returns the token thats the users
    */
   @ApiParam({ name: 'id', description: 'id of the token updated', example: 25 })
-  @ApiOkResponse({ description: 'Ok. Returns one token by its id' })
+  @ApiOkResponse({ description: 'Ok. Returns one token by its id', type: CreateUserTokenDto })
   @Get(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   findOne(@Param('id') id: string, @Request() request) {
-    const user = request.user as User
-    if(user.role != 'admin'){
-      throw new UnauthorizedException('Acces unauthorized')
+    const user = request.user as User;
+    if (user.role != 'admin') {
+      throw new UnauthorizedException('Acces unauthorized');
     }
     return this.userTokenService.findOne(+id);
   }
@@ -152,7 +172,7 @@ export class UserTokenController {
   update(
     @Param('id') id: string,
     @Body() updateUserTokenDto: UpdateUserTokenDto,
-    @Request() request
+    @Request() request,
   ) {
     return this.userTokenService.update(+id, updateUserTokenDto);
   }
@@ -171,7 +191,7 @@ export class UserTokenController {
   @Delete(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
-  remove(@Param('id') id: string,@Request() request) {
+  remove(@Param('id') id: string, @Request() request) {
     return this.userTokenService.remove(+id);
   }
 }
