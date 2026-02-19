@@ -13,6 +13,14 @@ export class RoommatesPrefrencesService {
 
   
   // CRUD METHODS
+  /**
+   * Creates new prefrences for user
+   * @param createRoommatesPrefrenceDto  Data for creating the prefrences
+   * @param userId  User's id to connect the prefrences to
+   * @throws {BadRequestException} Bad request
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @returns 
+   */
   create(createRoommatesPrefrenceDto: CreateRoommatesPrefrenceDto, userId : number) {
     try{
       return this.db.roommatesPrefrences.create({
@@ -26,6 +34,14 @@ export class RoommatesPrefrencesService {
 
   
   //TODO: Remake the function to be more readable and efficent
+  /**
+   * 
+   * @param id user's id to find the prefrences to match with other users
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} User not found 
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @returns   returns an array of users that are sorted by how good they match with the user with the given id, the array can be empty if there are no other users or if the user with the given id has no prefrences
+   */
   async getMatches(id: number) {
     const balanceMatchScores = 0.7 //The wheight to adjust how much the user's prefrenc matters compared to the potentilaMatches's prefrence (0 to 1)
     
@@ -87,7 +103,10 @@ export class RoommatesPrefrencesService {
       handlePrismaError(error)
     }
   }
-
+  /**
+   * all preference data
+   * @returns  returns an array of all preferenc records with all data
+   */
   findAll() {
     try{
       return this.db.roommatesPrefrences.findMany();
@@ -95,7 +114,11 @@ export class RoommatesPrefrencesService {
       handlePrismaError(error)
     }
   }
-
+  /**
+   * finds a specific preference record by id
+   * @param id idRoommatesPrefrences
+   * @returns 
+   */
   findOne(id: number) {
     try{
       return this.db.roommatesPrefrences.findUniqueOrThrow({
@@ -105,7 +128,12 @@ export class RoommatesPrefrencesService {
       handlePrismaError(error)
     }
   }
-
+  /**
+   * updates a specific preference record by id
+   * @param id idRoommatesPrefrences
+   * @param updateRoommatesPrefrenceDto 
+   * @returns  Updated preference record
+   */
   update(id: number, updateRoommatesPrefrenceDto: UpdateRoommatesPrefrenceDto) {
     try{
       return this.db.roommatesPrefrences.update({
@@ -116,7 +144,11 @@ export class RoommatesPrefrencesService {
       handlePrismaError(error)
     }
   }
-
+  /**
+   * Deletes a preference record by id
+   * @param id idRoommatesPrefrences
+   * @returns 
+   */
   remove(id: number) {
     try{
       return this.db.roommatesPrefrences.delete({
