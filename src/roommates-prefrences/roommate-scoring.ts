@@ -58,62 +58,37 @@ function roommateScoringPercentige(
   }
   console.log('Score after language: ' + score + '/' + max);
 
-  //Age scoring
-  max += W_AGE;
-  console.log('Scoring age: ');
-  console.log(
-    'Preference age range: ' +
-      preferences.roommatesPrefrences.minAge +
-      '-' +
-      preferences.roommatesPrefrences.maxAge,
-  );
-  console.log('Candidate age: ' + potentialMatch.age);
-  if (
-    !preferences.roommatesPrefrences.minAge &&
-    !preferences.roommatesPrefrences.maxAge
-  ) {
-    console.log('No age preference, giving full points');
-    score += W_AGE; //if no age preference
-  } else if (!potentialMatch.age) {
-    score += W_AGE * unknownAgeMultiplier; //if potential match has no age
-  }
-  //TODO: consider giving more points for being close to the preferred age range, and less points the further away they are
-  else if (
-    (preferences.roommatesPrefrences.minAge &&
-      potentialMatch.age < preferences.roommatesPrefrences.minAge) ||
-    (preferences.roommatesPrefrences.maxAge &&
-      potentialMatch.age > preferences.roommatesPrefrences.maxAge)
-  ) {
-    console.log('Age mismatch, giving penalty');
-    score += W_AGE * ageDifferencePenalty;
-  } else {
-    console.log('Age match, giving full points');
-    score += W_AGE; // points for age match
-  }
-  console.log('Score after age: ' + score + '/' + max);
+    //Age scoring
+    max += W_AGE;
+    if (!preferences.roommatesPrefrences.minAge && !preferences.roommatesPrefrences.maxAge) {
+        score += W_AGE; //if no age preference
+    }
+    else if (!potentialMatch.age) {
+        score += W_AGE * unknownAgeMultiplier; //if potential match has no age
+    }
+    //TODO: consider giving more points for being close to the preferred age range, and less points the further away they are
+    else if (!(preferences.roommatesPrefrences.minAge && potentialMatch.age > preferences.roommatesPrefrences.minAge) || !(preferences.roommatesPrefrences.maxAge && potentialMatch.age < preferences.roommatesPrefrences.maxAge)) {
+        score += W_AGE * ageDifferencePenalty 
+    }
+    else {
+        score += W_AGE; // points for age match
+    }
 
-  //Gender scoring
-  max += W_GENDER;
-  console.log('Scoring gender: ');
-  console.log('Preference gender: ' + preferences.roommatesPrefrences.gender);
-  console.log('Candidate gender: ' + potentialMatch.gender);
-  if (
-    !preferences.roommatesPrefrences.gender ||
-    preferences.roommatesPrefrences.gender === 'any'
-  ) {
-    console.log('No gender preference, giving full points');
-    score += W_GENDER; //if no gender preference
-  } else if (!potentialMatch.gender) {
-    console.log('Candidate has no gender specified, giving partial points');
-    score += W_GENDER * unknownGenderMultiplier; //if potential match has no gender specified
-  } else if (preferences.roommatesPrefrences.gender !== potentialMatch.gender) {
-    console.log('Gender mismatch, giving penalty');
-    score += W_GENDER * notMatchingGenderPenalty; // points for gender mismatch
-  } else {
-    console.log('Gender match, giving full points');
-    score += W_GENDER; // points for gender match
-  }
-  console.log('Score after gender: ' + score + '/' + max);
+    //Gender scoring
+    max += W_GENDER;
+    if (!preferences.gender) {
+        score += W_GENDER; //if no gender preference
+    }
+    else if (!potentialMatch.gender) {
+        score += W_GENDER * unknownGenderMultiplier; //if potential match has no gender specified
+    }
+    else if (!(preferences.gender === potentialMatch.gender)) {
+        score += W_GENDER * notMatchingGenderPenalty; // points for gender mismatch
+    }
+    else{
+        score += W_GENDER // points for gender match
+    }
+
 
   //Calculate and return the final score as a percentage
   if (!max || max == 0 || !score) {

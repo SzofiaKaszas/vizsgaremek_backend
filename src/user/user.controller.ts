@@ -182,7 +182,7 @@ export class UserController {
     example: 1
   })
   @ApiBody({
-    type: UpdateUserDto
+    type: UserBaseDto
   })
   @ApiOkResponse({
     description: 'Returns data of modified user',
