@@ -2,41 +2,68 @@ import { Injectable } from '@nestjs/common';
 import { CreateHouseListingDto } from './dto/create-house-listing.dto';
 import { UpdateHouseListingDto } from './dto/update-house-listing.dto';
 import { PrismaService } from 'src/prisma.service';
+import {handlePrismaError} from "../helperFunctions/helpers"
 
 @Injectable()
 export class HouseListingService {
   constructor(private readonly db: PrismaService) {}
+
   // create a new house listing
-  create(createHouseListingDto: CreateHouseListingDto) {
-    return this.db.houseListing.create({
-      data: createHouseListingDto,
-    });
+  async create(createHouseListingDto: CreateHouseListingDto) {
+    try{
+      return await this.db.houseListing.create({
+        data: createHouseListingDto,
+      });
+
+    }catch(error){
+      handlePrismaError(error)
+    }
   }
 
   // get all house listings
-  findAll() {
-    return this.db.houseListing.findMany();
+  async findAll() {
+    try{
+      return await this.db.houseListing.findMany();
+
+    }catch(error){
+      handlePrismaError(error)
+    }
   }
 
   // get a single house listing by id
-  findOne(id: number) {
-    return this.db.houseListing.findUnique({
-      where: { idHouse: id },
-    });
+  async findOne(id: number) {
+    try{
+      return await this.db.houseListing.findUnique({
+        where: { idHouse: id },
+      });
+
+    }catch(error){
+      handlePrismaError(error)
+    }
   }
 
   // update a house listing by id
-  update(id: number, updateHouseListingDto: UpdateHouseListingDto) {
-    return this.db.houseListing.update({
-      where: { idHouse: id },
-      data: updateHouseListingDto,
-    });
+  async update(id: number, updateHouseListingDto: UpdateHouseListingDto) {
+    try{
+      return await this.db.houseListing.update({
+        where: { idHouse: id },
+        data: updateHouseListingDto,
+      });
+
+    }catch(error){
+      handlePrismaError(error)
+    }
   }
 
   // delete a house listing by id
-  remove(id: number) {
-    return this.db.houseListing.delete({
-      where: { idHouse: id },
-    });
+  async remove(id: number) {
+    try{
+      return await this.db.houseListing.delete({
+        where: { idHouse: id },
+      });
+
+    }catch(error){
+      handlePrismaError(error)
+    }
   }
 }
