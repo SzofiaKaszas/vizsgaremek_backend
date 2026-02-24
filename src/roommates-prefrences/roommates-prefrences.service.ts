@@ -145,7 +145,7 @@ export class RoommatesPrefrencesService {
   update(id: number, updateRoommatesPrefrenceDto: UpdateRoommatesPrefrenceDto) {
     try{
       return this.db.roommatesPrefrences.update({
-        where: { idRoommatesPrefrences: id },
+        where: { roommatesPrefrencesIdUser: id },
         data: updateRoommatesPrefrenceDto,
       });
     }catch(error){
