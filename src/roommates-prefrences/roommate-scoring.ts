@@ -67,7 +67,7 @@ function roommateScoringPercentige(
         score += W_AGE * unknownAgeMultiplier; //if potential match has no age
     }
     //TODO: consider giving more points for being close to the preferred age range, and less points the further away they are
-    else if (!(preferences.roommatesPrefrences.minAge && potentialMatch.age > preferences.roommatesPrefrences.minAge) || !(preferences.roommatesPrefrences.maxAge && potentialMatch.age < preferences.roommatesPrefrences.maxAge)) {
+    else if (preferences.roommatesPrefrences.minAge && potentialMatch.age < preferences.roommatesPrefrences.minAge || preferences.roommatesPrefrences.maxAge && potentialMatch.age > preferences.roommatesPrefrences.maxAge) {
         score += W_AGE * ageDifferencePenalty 
     }
     else {
@@ -76,13 +76,13 @@ function roommateScoringPercentige(
 
     //Gender scoring
     max += W_GENDER;
-    if (!preferences.gender) {
+    if (!preferences.roommatesPrefrences.gender) {
         score += W_GENDER; //if no gender preference
     }
     else if (!potentialMatch.gender) {
         score += W_GENDER * unknownGenderMultiplier; //if potential match has no gender specified
     }
-    else if (!(preferences.gender === potentialMatch.gender)) {
+    else if (!(preferences.roommatesPrefrences.gender === potentialMatch.gender)) {
         score += W_GENDER * notMatchingGenderPenalty; // points for gender mismatch
     }
     else{
