@@ -18,7 +18,7 @@ export class HouseSearchPrefrencesService {
 
   findOne(id: number) {
     return this.db.houseSearchPrefrences.findUnique({
-      where: { idHousePrefrences: id },
+      where: { houseSearchIdUser: id },
     });
   }
 

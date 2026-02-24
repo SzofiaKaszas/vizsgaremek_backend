@@ -17,7 +17,6 @@ export class HouseSearchPrefrencesController {
     return this.houseSearchPrefrencesService.findAll();
   }
 
-  /*TODO: get house pref by token/user id*/
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.houseSearchPrefrencesService.findOne(+id);
