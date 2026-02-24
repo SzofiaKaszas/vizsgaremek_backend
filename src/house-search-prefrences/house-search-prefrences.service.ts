@@ -24,7 +24,7 @@ export class HouseSearchPrefrencesService {
 
   update(id: number, updateHouseSearchPrefrenceDto: UpdateHouseSearchPrefrenceDto) {
     return this.db.houseSearchPrefrences.update({
-      where: { idHousePrefrences: id },
+      where: { houseSearchIdUser: id },
       data: updateHouseSearchPrefrenceDto,
     });
   }
