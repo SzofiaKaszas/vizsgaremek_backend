@@ -77,6 +77,20 @@ async function main() {
         language: "English"
       }
     })
+    const testUser1HousePreferences = await tx.houseSearchPrefrences.create({
+      data:{
+        user: {connect:{idUser: testUser1.idUser}},
+        city: "Budapest",
+        furnishingLevel: "full",
+        heatingType: "radiator",
+        kitchenLevel: "full",
+        maxRent: 100000,
+        minBathrooms: 1,
+        minRooms: 3,
+        minSquareMeters: 100,
+        propertyType: "flat"
+      }
+    })
     const testUser2 = await tx.user.create({
       data:{
         firstName: "test02",
@@ -107,6 +121,23 @@ async function main() {
         maxAge: 30,
         gender: "male",
         language: "English"
+      }
+    })
+    const testUser2HouseListing = await tx.houseListing.create({
+      data:{
+        user: {connect: {idUser: testUser2.idUser}},
+        airConditioner: false,
+        city: "Budapest",
+        furnishingLevel: "full",
+        heatingType: "radiator",
+        kitchenLevel: "full",
+        rent: 90000,
+        bathrooms: 2,
+        numberOfRooms: 5,
+        squareMeter: 120,
+        propertyType: "flat",
+        description: "",
+        location:"",
       }
     })
 
