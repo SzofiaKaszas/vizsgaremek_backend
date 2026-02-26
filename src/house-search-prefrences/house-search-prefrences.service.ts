@@ -24,7 +24,7 @@ export class HouseSearchPrefrencesService {
   async findOne(id: number) {
     try{
       return await this.db.houseSearchPrefrences.findUnique({
-        where: { idHousePrefrences: id },
+        where: { houseSearchIdUser: id },
       });
     }catch(error){
       handlePrismaError(error)
@@ -34,7 +34,7 @@ export class HouseSearchPrefrencesService {
   async update(id: number, updateHouseSearchPrefrenceDto: UpdateHouseSearchPrefrenceDto) {
     try{
       return await this.db.houseSearchPrefrences.update({
-        where: { idHousePrefrences: id },
+        where: { houseSearchIdUser: id },
         data: updateHouseSearchPrefrenceDto,
       });
     }catch(error){

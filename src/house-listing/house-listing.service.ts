@@ -21,9 +21,13 @@ export class HouseListingService {
   }
 
   // get all house listings
-  async findAll() {
+  async findAll(idUser: number) {
     try{
-      return await this.db.houseListing.findMany();
+      return await this.db.houseListing.findMany({
+        where: {
+          houseIdUser: idUser,
+        },
+      });
 
     }catch(error){
       handlePrismaError(error)
