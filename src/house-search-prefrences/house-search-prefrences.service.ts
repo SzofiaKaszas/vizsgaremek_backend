@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateHouseSearchPrefrenceDto } from './dto/create-house-search-prefrence.dto';
 import { UpdateHouseSearchPrefrenceDto } from './dto/update-house-search-prefrence.dto';
 import { PrismaService } from 'src/prisma.service';
+import { handlePrismaError } from 'src/helperFunctions/helpers';
 
 @Injectable()
 export class HouseSearchPrefrencesService {
@@ -12,26 +13,42 @@ export class HouseSearchPrefrencesService {
     });
   }
 
-  findAll() {
-    return this.db.houseSearchPrefrences.findMany();
+  async findAll() {
+    try{
+      return await this.db.houseSearchPrefrences.findMany();
+    }catch(error){
+      handlePrismaError(error)
+    }
   }
 
-  findOne(id: number) {
-    return this.db.houseSearchPrefrences.findUnique({
-      where: { idHousePrefrences: id },
-    });
+  async findOne(id: number) {
+    try{
+      return await this.db.houseSearchPrefrences.findUnique({
+        where: { idHousePrefrences: id },
+      });
+    }catch(error){
+      handlePrismaError(error)
+    }
   }
 
-  update(id: number, updateHouseSearchPrefrenceDto: UpdateHouseSearchPrefrenceDto) {
-    return this.db.houseSearchPrefrences.update({
-      where: { idHousePrefrences: id },
-      data: updateHouseSearchPrefrenceDto,
-    });
+  async update(id: number, updateHouseSearchPrefrenceDto: UpdateHouseSearchPrefrenceDto) {
+    try{
+      return await this.db.houseSearchPrefrences.update({
+        where: { idHousePrefrences: id },
+        data: updateHouseSearchPrefrenceDto,
+      });
+    }catch(error){
+      handlePrismaError(error)
+    }
   }
 
-  remove(id: number) {
-    return this.db.houseSearchPrefrences.delete({
-      where: { idHousePrefrences: id },
-    });
+  async remove(id: number) {
+    try{
+      return await this.db.houseSearchPrefrences.delete({
+        where: { idHousePrefrences: id },
+      });
+    }catch(error){
+      handlePrismaError(error)
+    }
   }
 }
