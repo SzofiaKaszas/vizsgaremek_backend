@@ -42,9 +42,9 @@ export class HouseListingController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.houseListingService.findAll();
+  @Get(":id/all")
+  findAll(@Param("id", ParseIntPipe) id: number) {
+    return this.houseListingService.findAll(id);
   }
 
   @Get(':id')
