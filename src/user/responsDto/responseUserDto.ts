@@ -49,7 +49,8 @@ export class UserNecessaryDto extends PickType(UserBaseDto, [
   "firstName",
   "lastName",
   "connectionEmail",
-  "phoneNumber"
+  "phoneNumber",
+  "userBio"
 ] as const){}
 
 

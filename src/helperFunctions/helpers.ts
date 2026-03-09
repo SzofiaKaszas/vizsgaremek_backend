@@ -88,4 +88,22 @@ function isSoonerInList(orderedList : any[], value: any, beforeThanThis : any) :
   return valueIndex <= beforeThanThisIndex
 }
 
-export{/*checkauthorization,*/ isAdmin, isAuthorized, handlePrismaError, calculateOutsidePreferencePercentage, isSoonerInList}
+function getAgeFromBirthdate(birthdate) : number|null {
+  if(!birthdate){return null}
+  const today = new Date();
+  const birth = new Date(birthdate);
+
+  let age = today.getFullYear() - birth.getFullYear();
+
+  const hasHadBirthdayThisYear =
+    today.getMonth() > birth.getMonth() ||
+    (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
+
+  if (!hasHadBirthdayThisYear) {
+    age--;
+  }
+
+  return age;
+}
+
+export{/*checkauthorization,*/ isAdmin, isAuthorized, handlePrismaError, calculateOutsidePreferencePercentage, isSoonerInList, getAgeFromBirthdate}

@@ -6,12 +6,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import {handlePrismaError} from '../helperFunctions/helpers'
+import { CreateRatingDto } from './dto/create-rating.dto';
+
 
 /**
  * The user handler class
  */
 @Injectable()
 export class UserService {
+  
   constructor(private readonly db: PrismaService) {}
 
 
@@ -115,6 +118,7 @@ export class UserService {
           lastName: true,
           connectionEmail: true,
           phoneNumber: true,
+          userBio: true
         },
       });
 
@@ -155,6 +159,19 @@ export class UserService {
       return await this.db.user.findMany({ omit:{password: true} });
     }catch(error){
       handlePrismaError(error) 
+    }
+  }
+
+  async rateUser(idUser: number, id: number,createRatingDto: CreateRatingDto) {
+    try{
+      return await this.db.roommateRatings.create({
+        data:{
+          ratingMessage: createRatingDto.ratingMessage,
+          ratingScore
+        }
+      })
+    }catch(error){
+      handlePrismaError(error)
     }
   }
 

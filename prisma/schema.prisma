@@ -57,11 +57,12 @@ model User {
 
   //optional fields if you are looking for roommates
   userBio         String?
-  age             Int? //Change to birthdate
+  birthDay        DateTime?
   gender          String? //maybe enum later
   language        String?
   occupation      String?
   connectionEmail String? //contactemail (the right word)
+  rating          Float?
 
   hasHouse         Boolean
   lookingForPeople Boolean
@@ -76,7 +77,10 @@ model User {
   houseSearchPrefrences HouseSearchPrefrences?
   likedRoommates      LikedRoommate[]        @relation("UserLikes")
   likedBy             LikedRoommate[]        @relation("UserLikedBy")
+  ratedRoommates      RoommateRatings[]      @relation("UserRatings")
+  ratedBy             RoommateRatings[]      @relation("UserRatedBy")
   likedHouses         LikedHouse[]
+
 }
 
 //UserToken Model to store user authentication tokens (done)
@@ -113,6 +117,23 @@ model LikedRoommate {
   liked       User     @relation("UserLikedBy", fields: [likedUserId], references: [idUser], onDelete: Cascade)
 
   @@unique([likerId, likedUserId])
+}
+
+model RoommateRatings {
+  id Int @id @default(autoincrement())
+  raterId Int
+  ratedUserId Int
+
+  ratingScore Int // 1 to 5 starts
+  ratingMessage String
+
+  approved Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  rater User @relation("UserRatings",fields: [raterId], references: [idUser], onDelete: Cascade)
+  rated User @relation("UserRatedBy",fields: [ratedUserId], references: [idUser], onDelete: Cascade)
+
+  @@unique([raterId,ratedUserId])
 }
 
 //RoommatesPrefrences Model to store user prefrences for roommates (maybe add more fields later)

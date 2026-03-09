@@ -22,6 +22,7 @@ import { User } from 'generated/prisma/client';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import {UserBaseDto,UserNecessaryDto} from "./responsDto/responseUserDto"
 import {isAuthorized} from "../helperFunctions/helpers"
+import { CreateRatingDto } from './dto/create-rating.dto';
 
 @Controller('user')
 export class UserController {
@@ -169,6 +170,19 @@ export class UserController {
   })
   findAll() {
     return this.userService.findAll();
+  }
+
+  @Post('rate/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  rate(
+    @Param('id', ParseIntPipe) id:number,
+    @Body() createRatingDto: CreateRatingDto,
+    @Request() request
+  ){
+    const user = request.user as User
+    return this.userService.rateUser(user.idUser,id,createRatingDto)
+
   }
 
   /**

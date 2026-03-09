@@ -1,4 +1,5 @@
 import { User, RoommatesPrefrences } from 'generated/prisma/client';
+import {getAgeFromBirthdate} from '../helperFunctions/helpers'
 
 interface UserPlusPrefrenc extends User {
   roommatesPrefrences: RoommatesPrefrences;
@@ -17,6 +18,10 @@ function roommateScoringPercentige(
 ): number {
   let score = 0;
   let max = 0;
+  let age : number|null = null
+  if(potentialMatch.birthDay){
+    age = getAgeFromBirthdate(potentialMatch.birthDay)
+  }
 
   //wheight for each criterion (tunable)
   //ADD UP TO 100
@@ -63,17 +68,17 @@ function roommateScoringPercentige(
     console.log('Scoring age: ');
     console.log('Preference min age: ' + preferences.roommatesPrefrences.minAge);
     console.log('Preference max age: ' + preferences.roommatesPrefrences.maxAge);
-    console.log('Candidate age: ' + potentialMatch.age);
+    console.log('Candidate age: ' + age);
     if (!preferences.roommatesPrefrences.minAge && !preferences.roommatesPrefrences.maxAge) {
       console.log('No age preference, giving full points');
         score += W_AGE; //if no age preference
     }
-    else if (!potentialMatch.age) {
+    else if (!age) {
       console.log('Candidate has no age specified, giving partial points');
         score += W_AGE * unknownAgeMultiplier; //if potential match has no age
     }
     //TODO: consider giving more points for being close to the preferred age range, and less points the further away they are
-    else if (preferences.roommatesPrefrences.minAge && potentialMatch.age < preferences.roommatesPrefrences.minAge || preferences.roommatesPrefrences.maxAge && potentialMatch.age > preferences.roommatesPrefrences.maxAge) {
+    else if (preferences.roommatesPrefrences.minAge && age < preferences.roommatesPrefrences.minAge || preferences.roommatesPrefrences.maxAge && age > preferences.roommatesPrefrences.maxAge) {
       console.log('Age mismatch, giving penalty');  
       score += W_AGE * ageDifferencePenalty 
     }
