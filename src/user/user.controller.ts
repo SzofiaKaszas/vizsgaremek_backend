@@ -13,6 +13,7 @@ import {
   ForbiddenException,
   ParseIntPipe,
   UnauthorizedException,
+  Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
@@ -22,7 +23,8 @@ import { User } from 'generated/prisma/client';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import {UserBaseDto,UserNecessaryDto} from "./responsDto/responseUserDto"
 import {isAuthorized} from "../helperFunctions/helpers"
-import { CreateRatingDto } from './dto/create-rating.dto';
+import { CreateRatingDto, UpdateRatingDto } from './dto/create-rating.dto';
+import type { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -172,6 +174,34 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  /**
+   * Likes user or removes like if already liked
+   */
+  @Post('like/:id')
+  @ApiCreatedResponse({
+    description: 'Like succefuly created',
+  })
+  @ApiOkResponse({
+    description: 'Like deleted'
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  async like(
+    @Param('id', ParseIntPipe) id:number,
+    @Request() request,
+    @Res() res : Response
+  ){
+    //console.log("like called")
+    const user = request.user as User
+    const result = await this.userService.likeUser(user.idUser,id)
+    const data = result.data
+    if(result.action == 'created'){
+      return res.status(201).send({data})
+    }else{
+      return res.status(200).send({data})
+    }
+  }
+
   @Post('rate/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
@@ -180,11 +210,23 @@ export class UserController {
     @Body() createRatingDto: CreateRatingDto,
     @Request() request
   ){
+    //console.log("rate called")
     const user = request.user as User
     return this.userService.rateUser(user.idUser,id,createRatingDto)
-
   }
 
+  @Patch('rate/:id')
+   @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  updateRating(
+    @Param('id', ParseIntPipe) id:number,
+    @Body() updateRatingDto: UpdateRatingDto,
+    @Request() request
+  ){
+    //console.log("rate called")
+    const user = request.user as User
+    return this.userService.updateratingUser(user.idUser,id,updateRatingDto)
+  }
   /**
    * Updates user by id + validation 
    */

@@ -69,10 +69,15 @@ export class RoommatesPrefrencesService {
       console.log("Users to match with:")
       //console.log(usersRaw)
       // filter out users without roommatesPrefrences and compute mutual scores
-      const scored = usersRaw
+      const hasPref = usersRaw.map((u)=>{
+        const candidate = u as unknown as UserPlusPrefrenc;
+        if(candidate.roommatesPrefrences){return candidate}
+      })
+      const scored = hasPref
         //.filter((u) => !!u.roommatesPrefrences)
         .map((u) => {
           const candidate = u as unknown as UserPlusPrefrenc;
+          
           console.log("Candidate:")
           console.log(candidate)
           const scoreA = roommateScoringPercentige(userToMatch, candidate); // user -> candidate
@@ -88,10 +93,11 @@ export class RoommatesPrefrencesService {
         'idUser',
         'firstName',
         'lastName',
-        'age',
+        'birthDay',
         'gender',
         'language',
         'email',
+        'userBio'
       ];
   
       return scored.map((s) => {

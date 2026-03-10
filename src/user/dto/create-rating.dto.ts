@@ -1,4 +1,5 @@
-import { IsInt, IsOptional, IsPositive, IsString } from "class-validator";
+import { PartialType } from "@nestjs/mapped-types";
+import { IsInt, IsOptional, IsPositive, IsString, Min, Max } from "class-validator";
 
 export class CreateRatingDto{
   @IsOptional()
@@ -7,6 +8,9 @@ export class CreateRatingDto{
 
   @IsInt()
   @IsPositive()
-  @Is
-  ratingScore
+  @Min(1)
+  @Max(5)
+  ratingScore : number
 }
+
+export class UpdateRatingDto extends PartialType(CreateRatingDto) {}

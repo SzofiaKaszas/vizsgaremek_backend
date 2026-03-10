@@ -20,8 +20,12 @@ function roommateScoringPercentige(
   let max = 0;
   let age : number|null = null
   if(potentialMatch.birthDay){
+    console.log(potentialMatch.birthDay)
+    console.log("runing age calc")
     age = getAgeFromBirthdate(potentialMatch.birthDay)
+    console.log(age)
   }
+  age = 10
 
   //wheight for each criterion (tunable)
   //ADD UP TO 100
@@ -38,15 +42,18 @@ function roommateScoringPercentige(
   const ageDifferencePenalty = 0.1; //penalty multiplier for each year of age difference beyond the preferred range
 
   //Gender Penalty Constants
-  const unknownGenderMultiplier = 0.5; //penalty multiplier for not specifying a gender
+  const unknownGenderMultiplier = 0.5; //penalty multiplier for not specifying a gender 
   const notMatchingGenderPenalty = 0.1; //penalty multiplier for gender mismatch
 
   //Language scoring
   max += W_LANGUAGE;
   console.log('Scoring language: ');
-  console.log(
+  console.log('asd1')
+  console.log(preferences.roommatesPrefrences)
+  /*console.log(
     'Preference language: ' + preferences.roommatesPrefrences.language,
-  );
+  );*/
+  console.log('asd2')
   console.log('Candidate language: ' + potentialMatch.language);
   if (!preferences.roommatesPrefrences.language) {
     console.log('No language preference, giving full points');

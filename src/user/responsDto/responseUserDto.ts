@@ -53,6 +53,8 @@ export class UserNecessaryDto extends PickType(UserBaseDto, [
   "userBio"
 ] as const){}
 
-
+export class UserLike{
+  
+}
 
 
