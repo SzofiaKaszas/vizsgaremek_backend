@@ -68,6 +68,12 @@ async function main() {
         token: "test01token",
       }
     })
+    const testUser1Token2 = await tx.userToken.create({
+      data:{
+        user: {connect: {idUser: testUser1.idUser} },
+        token: "t1",
+      }
+    })
     const testUser1Preferences = await tx.roommatesPrefrences.create({
       data:{
         user: {connect: {idUser: testUser1.idUser} },
