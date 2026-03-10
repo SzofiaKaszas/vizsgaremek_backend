@@ -69,10 +69,12 @@ export class RoommatesPrefrencesService {
       console.log("Users to match with:")
       //console.log(usersRaw)
       // filter out users without roommatesPrefrences and compute mutual scores
-      const hasPref = usersRaw.map((u)=>{
+      const hasPref = usersRaw.filter((u)=>{
         const candidate = u as unknown as UserPlusPrefrenc;
         if(candidate.roommatesPrefrences){return candidate}
       })
+      console.log("Has Pref:")
+      console.log(hasPref)
       const scored = hasPref
         //.filter((u) => !!u.roommatesPrefrences)
         .map((u) => {
