@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UnauthorizedException, ParseIntPipe, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UnauthorizedException, ParseIntPipe, BadRequestException, Res } from '@nestjs/common';
 import { HouseListingService } from './house-listing.service';
 import { CreateHouseListingDto } from './dto/create-house-listing.dto';
 import { UpdateHouseListingDto } from './dto/update-house-listing.dto';
@@ -50,6 +50,21 @@ export class HouseListingController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.houseListingService.findOne(id);
+  }
+
+  @Post('like/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  async like(
+    @Param('id', ParseIntPipe) id:number,
+    @Request() request,
+    @Res() res : Response
+  ){
+    const user = request.user as User
+    const result = await this.houseListingService.likeHouse(user.idUser,id)
+    const data = result.data 
+    //TODO: add check for action
+    return data
   }
 
   @Patch(':id')

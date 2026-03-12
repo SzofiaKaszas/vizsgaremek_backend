@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
 import { RoommatesPrefrencesService } from './roommates-prefrences.service';
 import { CreateRoommatesPrefrenceDto } from './dto/create-roommates-prefrence.dto';
 import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dto';
@@ -148,8 +148,8 @@ export class RoommatesPrefrencesController {
     description: 'Returns the preference record with the given id',
     type: RoommatesPrefrencesBaseDto,
   })
-  findOne(@Param('id') id: string) {
-    return this.roommatesPrefrencesService.findOne(+id);
+  findOne(@Param('id',ParseIntPipe) id: number) {
+    return this.roommatesPrefrencesService.findOne(id);
   }
   /**
    * Updates a preference record by id

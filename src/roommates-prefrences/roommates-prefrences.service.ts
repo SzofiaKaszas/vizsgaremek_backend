@@ -139,7 +139,7 @@ export class RoommatesPrefrencesService {
   findOne(id: number) {
     try{
       return this.db.roommatesPrefrences.findUniqueOrThrow({
-        where: { idRoommatesPrefrences: id },
+        where: { roommatesPrefrencesIdUser : id },
       });
     }catch(error){
       handlePrismaError(error)

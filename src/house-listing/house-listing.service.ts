@@ -6,6 +6,7 @@ import {handlePrismaError} from "../helperFunctions/helpers"
 
 @Injectable()
 export class HouseListingService {
+  
   constructor(private readonly db: PrismaService) {}
 
   // create a new house listing
@@ -41,6 +42,39 @@ export class HouseListingService {
         where: { idHouse: id },
       });
 
+    }catch(error){
+      handlePrismaError(error)
+    }
+  }
+
+  async likeHouse(likerUserId: number, likedHouseId: number) {
+    try{
+      const isAlreadyLiked = await this.db.likedHouse.findUnique({
+        where:{
+          userId_houseId:{
+            userId: likerUserId,
+            houseId: likedHouseId
+          }
+        }
+      })
+      if(isAlreadyLiked){
+        const deletedLike = await this.db.likedHouse.delete({
+          where:{
+          userId_houseId:{
+            userId: likerUserId,
+            houseId: likedHouseId
+          }
+        }
+        });
+        return { action: 'removed', data: deletedLike };
+      }
+      const createdLike = await this.db.likedHouse.create({
+        data:{
+          userId: likerUserId,
+          houseId: likedHouseId
+        }
+      })
+      return { action: 'created', data: createdLike };
     }catch(error){
       handlePrismaError(error)
     }
