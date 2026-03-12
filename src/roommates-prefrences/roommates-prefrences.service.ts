@@ -46,7 +46,7 @@ export class RoommatesPrefrencesService {
     const balanceMatchScores = 0.7 //The wheight to adjust how much the user's prefrenc matters compared to the potentilaMatches's prefrence (0 to 1)
     
     try{
-      const userToMatchRaw = await this.db.user.findUnique({
+      const userToMatchRaw = await this.db.user.findUniqueOrThrow({
         where: { idUser: id },
         include: { roommatesPrefrences: true },
       });

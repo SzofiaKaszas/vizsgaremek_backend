@@ -37,7 +37,7 @@ export class HouseListingService {
   // get a single house listing by id
   async findOne(id: number) {
     try{
-      return await this.db.houseListing.findUnique({
+      return await this.db.houseListing.findUniqueOrThrow({
         where: { idHouse: id },
       });
 

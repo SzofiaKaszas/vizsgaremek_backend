@@ -1,8 +1,8 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserTokenDto } from './dto/create-user-token.dto';
 import { UpdateUserTokenDto } from './dto/update-user-token.dto';
 import { PrismaService } from 'src/prisma.service';
-import { Prisma } from 'generated/prisma/client';
+import {handlePrismaError} from '../helperFunctions/helpers'
 //import { Prisma } from '@prisma/client';
 
 /**
@@ -14,22 +14,7 @@ import { Prisma } from 'generated/prisma/client';
 export class UserTokenService {
   constructor(private readonly db: PrismaService) {}
 
-  private handlePrismaError(error: unknown): never {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        switch (error.code) {
-          case 'P2002':
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            throw new ConflictException(`User with this ${error.meta?.target} already exists`);
-          case 'P2025':
-            throw new NotFoundException('User not found');
-          case 'P2003':
-            throw new BadRequestException('Invalid reference provided');
-          default:
-            throw new InternalServerErrorException('Database operation failed');
-        }
-      }
-      throw new InternalServerErrorException('An unexpected error occurred');
-    }
+  
 
   /**
    * Creates a new user token
@@ -43,7 +28,7 @@ export class UserTokenService {
         data: createUserTokenDto,
       });
       }catch(error){
-      this.handlePrismaError(error)
+      handlePrismaError(error)
     }
   }
 
@@ -56,7 +41,7 @@ export class UserTokenService {
     try{
       return this.db.userToken.findMany();
       }catch(error){
-      this.handlePrismaError(error)
+      handlePrismaError(error)
     }
   }
 
@@ -68,11 +53,11 @@ export class UserTokenService {
    */
   findOne(id: number) {
     try{
-      return this.db.userToken.findUnique({
+      return this.db.userToken.findUniqueOrThrow({
         where: { idUserToken: id },
       });
       }catch(error){
-      this.handlePrismaError(error)
+      handlePrismaError(error)
     }
   }
 
@@ -90,7 +75,7 @@ export class UserTokenService {
         data: updateUserTokenDto,
       });
       }catch(error){
-      this.handlePrismaError(error)
+      handlePrismaError(error)
     }
   }
 
@@ -106,7 +91,7 @@ export class UserTokenService {
         where: { idUserToken: id },
       });
       }catch(error){
-      this.handlePrismaError(error)
+      handlePrismaError(error)
     }
   }
 }
