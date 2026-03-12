@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoommatesPrefrenceDto } from './dto/create-roommates-prefrence.dto';
 import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -52,7 +52,8 @@ export class RoommatesPrefrencesService {
       });
   
       if (!userToMatchRaw || !userToMatchRaw.roommatesPrefrences) {
-        return [];
+        return []
+        throw new NotFoundException("No User or User does not have roommatePrefrences")
       }
   
       // ensure types for scoring function (it expects UserPlusPrefrenc)

@@ -88,7 +88,6 @@ export class RoommatesPrefrencesController {
    * 
    */
   @Get('getmatches')
-  
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   @ApiOkResponse({
@@ -111,8 +110,8 @@ export class RoommatesPrefrencesController {
     const user = request.user as User;
     //console.log("------------------")
     //console.log(user)
-    const matches : User[] =  await this.roommatesPrefrencesService.getMatches(user.idUser);
-    return matches;
+    
+    return await this.roommatesPrefrencesService.getMatches(user.idUser);
   }
 
   //TODO: get pref by token/users id*/

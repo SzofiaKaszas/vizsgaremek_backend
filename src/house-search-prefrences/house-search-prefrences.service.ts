@@ -25,7 +25,7 @@ export class HouseSearchPrefrencesService {
 
   async findOne(id: number) {
     try{
-      return await this.db.houseSearchPrefrences.findUnique({
+      return await this.db.houseSearchPrefrences.findUniqueOrThrow({
         where: { houseSearchIdUser: id },
       });
     }catch(error){
