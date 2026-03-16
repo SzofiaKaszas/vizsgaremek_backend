@@ -106,4 +106,9 @@ function getAgeFromBirthdate(birthdate) : number|null {
   return age;
 }
 
+function discardFieldsNotMeantToBeChangedByUser(dto: any, whichTable: "user"|"houseListing"|"houseSearchPrefrences"|"roommatePrefrences"|"rating"){
+  if(!dto){return {}}
+
+}
+
 export{/*checkauthorization,*/ isAdmin, isAuthorized, handlePrismaError, calculateOutsidePreferencePercentage, isSoonerInList, getAgeFromBirthdate}

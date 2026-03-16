@@ -64,9 +64,9 @@ model User {
   connectionEmail String? //contactemail (the right word)
   rating          Float?
 
-  hasHouse         Boolean
-  lookingForPeople Boolean
-  lookingForHouse  Boolean
+  hasHouse         Boolean @default(false)
+  lookingForPeople Boolean @default(false)
+  lookingForHouse  Boolean @default(false)
 
   role String @default("user")
 

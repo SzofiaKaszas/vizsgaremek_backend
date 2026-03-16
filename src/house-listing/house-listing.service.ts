@@ -1,11 +1,17 @@
-import { Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateHouseListingDto } from './dto/create-house-listing.dto';
 import { UpdateHouseListingDto } from './dto/update-house-listing.dto';
 import { PrismaService } from 'src/prisma.service';
 import {handlePrismaError} from "../helperFunctions/helpers"
+import { CreateRatingDto, UpdateRatingDto } from 'src/user/dto/create-rating.dto';
 
 @Injectable()
 export class HouseListingService {
+  
+  
   
   constructor(private readonly db: PrismaService) {}
 
@@ -79,6 +85,48 @@ export class HouseListingService {
       handlePrismaError(error)
     }
   }
+
+  async rateHouse(raterUserId: number, ratedHouseId: number, createRatingDto: CreateRatingDto) {
+    try{
+      const isItTheirHouse = await this.db.houseListing.findUnique({
+        where:{
+          idHouse: ratedHouseId
+        }
+      })
+      if(!isItTheirHouse){throw new BadRequestException(`there is no house with id:${ratedHouseId}`)}
+      if(raterUserId == isItTheirHouse.houseIdUser){throw new ForbiddenException('user is not allowed to rate their own house')}
+      return await this.db.houseListingRatings.create({
+        data:{
+          ratingMessage: createRatingDto.ratingMessage,
+          ratingScore: createRatingDto.ratingScore,
+          raterId: raterUserId,
+          ratedHouseId: ratedHouseId
+        }
+      })
+    }catch(error){
+      handlePrismaError(error)
+    }
+  }
+
+  async updateratingHouse(raterUserId: number, ratedHouseId: number, updateRatingDto: UpdateRatingDto) {
+    try {
+      return await this.db.houseListingRatings.update({
+        where: {
+          raterId_ratedHouseId:{
+            raterId: raterUserId,
+            ratedHouseId: ratedHouseId}
+          },
+          data:{
+            ratingMessage: updateRatingDto.ratingMessage? updateRatingDto.ratingMessage : undefined,
+            ratingScore: updateRatingDto.ratingScore ? updateRatingDto.ratingScore : undefined
+          }
+        
+      })
+    } catch (error) {
+      handlePrismaError(error)
+    }
+  }
+
 
   // update a house listing by id
   async update(id: number, updateHouseListingDto: UpdateHouseListingDto) {

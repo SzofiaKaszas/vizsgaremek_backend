@@ -212,6 +212,7 @@ export class UserController {
   ){
     //console.log("rate called")
     const user = request.user as User
+    if(user.idUser == id){throw new ForbiddenException('user is not allowed to rate themself')}
     return this.userService.rateUser(user.idUser,id,createRatingDto)
   }
 
@@ -225,6 +226,7 @@ export class UserController {
   ){
     //console.log("rate called")
     const user = request.user as User
+    if(user.idUser == id){throw new ForbiddenException('user is not allowed to rate themself')}
     return this.userService.updateratingUser(user.idUser,id,updateRatingDto)
   }
   /**

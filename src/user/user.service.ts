@@ -227,7 +227,8 @@ export class UserService {
             }
         },
         data:{
-          ...updateRatingDto
+          ratingMessage: updateRatingDto.ratingMessage ? updateRatingDto.ratingMessage : undefined,
+          ratingScore: updateRatingDto.ratingScore ? updateRatingDto.ratingScore : undefined
         }
       })
     } catch (error) {
@@ -252,7 +253,23 @@ export class UserService {
       }
       return await this.db.user.update({
         where: { idUser: id },
-        data: updateUserDto,
+        data: {
+          birthDay: updateUserDto.birthDay? updateUserDto.birthDay : undefined,
+          connectionEmail: updateUserDto.connectionEmail? updateUserDto.connectionEmail : undefined,
+          email : updateUserDto.email ? updateUserDto.email : undefined,
+          firstName : updateUserDto.firstName ? updateUserDto.firstName : undefined,
+          gender : updateUserDto.gender ? updateUserDto.gender : undefined,
+          hasHouse : updateUserDto.hasHouse ? updateUserDto.hasHouse : undefined,
+          language : updateUserDto.language ? updateUserDto.language : undefined,
+          lastName : updateUserDto.lastName ? updateUserDto.lastName : undefined,
+          lookingForHouse : updateUserDto.lookingForHouse ? updateUserDto.lookingForHouse : undefined,
+          lookingForPeople : updateUserDto.lookingForPeople ? updateUserDto.lookingForPeople : undefined,
+          occupation : updateUserDto.occupation ? updateUserDto.occupation : undefined,
+          password : updateUserDto.password ? updateUserDto.password : undefined,
+          phoneNumber : updateUserDto.phoneNumber ? updateUserDto.phoneNumber : undefined,
+          userBio : updateUserDto.userBio ? updateUserDto.userBio : undefined,
+          
+        }
       });
     } catch (error) {
       handlePrismaError(error);
