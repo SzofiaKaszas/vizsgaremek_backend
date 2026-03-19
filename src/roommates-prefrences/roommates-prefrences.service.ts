@@ -4,7 +4,7 @@ import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dt
 import { PrismaService } from 'src/prisma.service';
 import { User } from 'generated/prisma/client';
 import { roommateScoringPercentige ,type UserPlusPrefrenc} from './roommate-scoring';
-import {handlePrismaError} from '../helperFunctions/helpers'
+import {discardFieldsNotMeantToBeChangedByUser, handlePrismaError} from '../helperFunctions/helpers'
 
 
 @Injectable()
@@ -24,7 +24,13 @@ export class RoommatesPrefrencesService {
   create(createRoommatesPrefrenceDto: CreateRoommatesPrefrenceDto, userId : number) {
     try{
       return this.db.roommatesPrefrences.create({
-        data: {...createRoommatesPrefrenceDto, user: {connect: {idUser: userId}}}
+        data: {
+          roommatesPrefrencesIdUser: userId,
+          gender : createRoommatesPrefrenceDto.gender ,
+          language : createRoommatesPrefrenceDto.language ,
+          maxAge : createRoommatesPrefrenceDto.maxAge ,
+          minAge : createRoommatesPrefrenceDto.minAge ,
+        }
         
       });
     }catch(error){
@@ -153,9 +159,10 @@ export class RoommatesPrefrencesService {
    */
   update(id: number, updateRoommatesPrefrenceDto: UpdateRoommatesPrefrenceDto) {
     try{
+      const dtoData = discardFieldsNotMeantToBeChangedByUser(updateRoommatesPrefrenceDto,'roommatePrefrences')
       return this.db.roommatesPrefrences.update({
         where: { roommatesPrefrencesIdUser: id },
-        data: updateRoommatesPrefrenceDto,
+        data: dtoData,
       });
     }catch(error){
       handlePrismaError(error)

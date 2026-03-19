@@ -11,7 +11,10 @@ import * as crypto from 'node:crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
-import { handlePrismaError } from '../helperFunctions/helpers';
+import {
+  handlePrismaError,
+  discardFieldsNotMeantToBeChangedByUser,
+} from '../helperFunctions/helpers';
 import { CreateRatingDto, UpdateRatingDto } from './dto/create-rating.dto';
 
 /**
@@ -40,7 +43,22 @@ export class UserService {
         password: await argon2.hash(createUserDto.password), //securely hash the password before storing
       };
       return await this.db.user.create({
-        data: newUser,
+        data: {
+          email: newUser.email,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          password: newUser.password,
+          hasHouse: newUser.hasHouse,
+          lookingForHouse: newUser.lookingForHouse,
+          lookingForPeople: newUser.lookingForPeople,
+          phoneNumber: newUser.phoneNumber,
+          birthDay: newUser.birthDay,
+          connectionEmail: newUser.connectionEmail,
+          gender: newUser.gender,
+          language: newUser.language,
+          occupation: newUser.occupation,
+          userBio: newUser.userBio,
+        },
         omit: {
           password: true,
         },
@@ -185,7 +203,7 @@ export class UserService {
       const createdLike = await this.db.likedRoommate.create({
         data: {
           likerId: liker,
-          likedUserId: likedUserId
+          likedUserId: likedUserId,
         },
       });
       return { action: 'created', data: createdLike };
@@ -200,6 +218,7 @@ export class UserService {
     createRatingDto: CreateRatingDto,
   ) {
     try {
+      //const data = discardFieldsNotMeantToBeChangedByUser(createRatingDto,'rating')
       return await this.db.roommateRatings.create({
         data: {
           ratingMessage: createRatingDto.ratingMessage,
@@ -216,23 +235,37 @@ export class UserService {
   async updateratingUser(
     raterId: number,
     ratedUserId: number,
-    updateRatingDto: UpdateRatingDto
-  ){
+    updateRatingDto: UpdateRatingDto,
+  ) {
     try {
-      return await this.db.roommateRatings.update({
-        where:{
-            raterId_ratedUserId:{
-              raterId: raterId,
-              ratedUserId: ratedUserId
-            }
+      const user = await this.db.user.findUnique({
+        where: {
+          idUser: raterId,
         },
-        data:{
-          ratingMessage: updateRatingDto.ratingMessage ? updateRatingDto.ratingMessage : undefined,
-          ratingScore: updateRatingDto.ratingScore ? updateRatingDto.ratingScore : undefined
-        }
-      })
+      });
+
+      let dtoData: Partial<UpdateRatingDto>;
+      if (user && user.role == 'admin') {
+        dtoData = updateRatingDto;
+      } else {
+        dtoData = discardFieldsNotMeantToBeChangedByUser(
+          updateRatingDto,
+          'rating',
+        );
+      }
+      return await this.db.roommateRatings.update({
+        where: {
+          raterId_ratedUserId: {
+            raterId: raterId,
+            ratedUserId: ratedUserId,
+          },
+        },
+        data: {
+          ...dtoData,
+        },
+      });
     } catch (error) {
-      handlePrismaError(error)
+      handlePrismaError(error);
     }
   }
 
@@ -251,25 +284,15 @@ export class UserService {
       if (updateUserDto.password) {
         updateUserDto.password = await argon2.hash(updateUserDto.password);
       }
+
+      const data = discardFieldsNotMeantToBeChangedByUser(
+        updateUserDto,
+        'user',
+      );
+
       return await this.db.user.update({
         where: { idUser: id },
-        data: {
-          birthDay: updateUserDto.birthDay? updateUserDto.birthDay : undefined,
-          connectionEmail: updateUserDto.connectionEmail? updateUserDto.connectionEmail : undefined,
-          email : updateUserDto.email ? updateUserDto.email : undefined,
-          firstName : updateUserDto.firstName ? updateUserDto.firstName : undefined,
-          gender : updateUserDto.gender ? updateUserDto.gender : undefined,
-          hasHouse : updateUserDto.hasHouse ? updateUserDto.hasHouse : undefined,
-          language : updateUserDto.language ? updateUserDto.language : undefined,
-          lastName : updateUserDto.lastName ? updateUserDto.lastName : undefined,
-          lookingForHouse : updateUserDto.lookingForHouse ? updateUserDto.lookingForHouse : undefined,
-          lookingForPeople : updateUserDto.lookingForPeople ? updateUserDto.lookingForPeople : undefined,
-          occupation : updateUserDto.occupation ? updateUserDto.occupation : undefined,
-          password : updateUserDto.password ? updateUserDto.password : undefined,
-          phoneNumber : updateUserDto.phoneNumber ? updateUserDto.phoneNumber : undefined,
-          userBio : updateUserDto.userBio ? updateUserDto.userBio : undefined,
-          
-        }
+        data,
       });
     } catch (error) {
       handlePrismaError(error);

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { CreateHouseSearchPrefrenceDto } from './dto/create-house-search-prefrence.dto';
 import { UpdateHouseSearchPrefrenceDto } from './dto/update-house-search-prefrence.dto';
 import { PrismaService } from 'src/prisma.service';
-import { handlePrismaError } from 'src/helperFunctions/helpers';
+import { discardFieldsNotMeantToBeChangedByUser, handlePrismaError } from 'src/helperFunctions/helpers';
 import { HouseListing} from 'generated/prisma/client';
 import {houseScoringPercentage} from './house-scoring'
 
@@ -11,7 +11,17 @@ export class HouseSearchPrefrencesService {
   constructor(private readonly db : PrismaService) {}
   create(createHouseSearchPrefrenceDto: CreateHouseSearchPrefrenceDto) {
     return this.db.houseSearchPrefrences.create({
-      data: createHouseSearchPrefrenceDto,
+      data: {
+        city : createHouseSearchPrefrenceDto.city ,
+        furnishingLevel : createHouseSearchPrefrenceDto.furnishingLevel ,
+        heatingType : createHouseSearchPrefrenceDto.heatingType ,
+        kitchenLevel : createHouseSearchPrefrenceDto.kitchenLevel ,
+        maxRent : createHouseSearchPrefrenceDto.maxRent ,
+        minBathrooms : createHouseSearchPrefrenceDto.minBathrooms ,
+        minRooms : createHouseSearchPrefrenceDto.minRooms ,
+        minSquareMeters : createHouseSearchPrefrenceDto.minSquareMeters ,
+        propertyType : createHouseSearchPrefrenceDto.propertyType ,
+      },
     });
   }
 
@@ -35,9 +45,10 @@ export class HouseSearchPrefrencesService {
 
   async update(id: number, updateHouseSearchPrefrenceDto: UpdateHouseSearchPrefrenceDto) {
     try{
+      const dtoData = discardFieldsNotMeantToBeChangedByUser(updateHouseSearchPrefrenceDto,'houseSearchPrefrences')
       return await this.db.houseSearchPrefrences.update({
         where: { houseSearchIdUser: id },
-        data: updateHouseSearchPrefrenceDto,
+        data: dtoData,
       });
     }catch(error){
       handlePrismaError(error)
