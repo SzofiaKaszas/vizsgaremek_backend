@@ -1,9 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   BadRequestException,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ConflictException,
   Injectable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   InternalServerErrorException,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   NotFoundException,
 } from '@nestjs/common';
 import * as argon2 from 'argon2';
@@ -98,6 +102,7 @@ export class UserService {
 
   /**
    * Finds a user by their email address
+   * !RETURNS PASSWORD! DO NOT SEND IT TO USER WITH THE PASSWORD
    *
    * @param email User's email address
    * @throws {BadRequestException} Bad request
@@ -107,7 +112,7 @@ export class UserService {
    */
   async findByEmail(email: string) {
     try {
-      return await this.db.user.findUniqueOrThrow({ where: { email: email } });
+      return await this.db.user.findUniqueOrThrow({ where: { email: email }, omit:{password:false} });
     } catch (error) {
       handlePrismaError(error);
     }
@@ -293,6 +298,7 @@ export class UserService {
       return await this.db.user.update({
         where: { idUser: id },
         data,
+        omit:{password:true}
       });
     } catch (error) {
       handlePrismaError(error);

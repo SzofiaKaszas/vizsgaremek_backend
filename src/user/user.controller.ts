@@ -21,7 +21,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'generated/prisma/client';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import {UserBaseDto,UserNecessaryDto} from "./responsDto/responseUserDto"
+import {UserBaseDto,UserBaseUpdateDto,UserNecessaryDto} from "./responsDto/responseUserDto"
 import {isAuthorized} from "../helperFunctions/helpers"
 import { CreateRatingDto, UpdateRatingDto } from './dto/create-rating.dto';
 import type { Response } from 'express';

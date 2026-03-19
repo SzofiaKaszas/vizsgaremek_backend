@@ -6,6 +6,7 @@ import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dt
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiUnauthorizedResponse} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import{RoommatesPrefrencesBaseDto} from './responsDto/response'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { RoommatesPrefrences, User } from 'generated/prisma/client';
 
 @Controller('roommates-prefrences')
