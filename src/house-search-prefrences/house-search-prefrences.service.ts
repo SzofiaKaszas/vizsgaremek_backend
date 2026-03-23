@@ -12,6 +12,7 @@ export class HouseSearchPrefrencesService {
   create(createHouseSearchPrefrenceDto: CreateHouseSearchPrefrenceDto) {
     return this.db.houseSearchPrefrences.create({
       data: {
+        houseSearchIdUser: createHouseSearchPrefrenceDto.houseSearchIdUser ,
         city : createHouseSearchPrefrenceDto.city ,
         furnishingLevel : createHouseSearchPrefrenceDto.furnishingLevel ,
         heatingType : createHouseSearchPrefrenceDto.heatingType ,
