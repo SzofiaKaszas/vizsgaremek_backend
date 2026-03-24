@@ -64,8 +64,8 @@ export class RoommatesPrefrencesService {
   
       // ensure types for scoring function (it expects UserPlusPrefrenc)
       const userToMatch = userToMatchRaw as unknown as UserPlusPrefrenc;
-      console.log("User to match:")
-      console.log(userToMatch)
+      //console.log("User to match:")
+      //console.log(userToMatch)
 
 
       const usersRaw = await this.db.user.findMany({
@@ -73,7 +73,7 @@ export class RoommatesPrefrencesService {
         include: { roommatesPrefrences: true },
       });
       
-      console.log("Users to match with:")
+      //console.log("Users to match with:")
       //console.log(usersRaw)
       // filter out users without roommatesPrefrences and compute mutual scores
       const liked = await this.db.likedRoommate.findMany({
@@ -85,7 +85,7 @@ export class RoommatesPrefrencesService {
         }
       })
       
-      console.log("Liked users:")
+      //console.log("Liked users:")
 
       const hasPref = usersRaw.filter((u)=>{
         const candidate = u as unknown as UserPlusPrefrenc;
@@ -97,23 +97,23 @@ export class RoommatesPrefrencesService {
         return !liked.some(l => l.likedUserId === candidate.idUser)
       })
 
-      console.log("Has Pref:")
-      console.log(hasPref)
+      //console.log("Has Pref:")
+      //console.log(hasPref)
       const scored = notAlreadyLiked
         //.filter((u) => !!u.roommatesPrefrences)
         .map((u) => {
           const candidate = u as unknown as UserPlusPrefrenc;
           
-          console.log("Candidate:")
-          console.log(candidate)
+          //console.log("Candidate:")
+          //console.log(candidate)
           const scoreA = roommateScoringPercentige(userToMatch, candidate); // user -> candidate
           const scoreB = roommateScoringPercentige(candidate, userToMatch); // candidate -> user
           const total = scoreA * balanceMatchScores + scoreB * (1-balanceMatchScores);
           return { user: u, score: total };
         })
         .sort((a, b) => b.score - a.score);
-        console.log("Scored matches:")
-        console.log(scored)
+        //console.log("Scored matches:")
+        //console.log(scored)
       // choose which fields to expose from the `User` record
       const allowed = [
         'idUser',
