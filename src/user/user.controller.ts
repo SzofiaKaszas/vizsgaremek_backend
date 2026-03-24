@@ -127,7 +127,17 @@ export class UserController {
   getPublicData(@Param('id', ParseIntPipe) id: number) {
     return this.userService.getNecessary(id);
   }
-
+  
+  @Get('liked')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  getLikes(
+    @Request() request,
+  ){
+    console.log("getLikes runing")
+    const user = request.user as User
+    return this.userService.getLikes(user.idUser)
+  }
   /**
    * Returns user from parameter id 
    */
@@ -173,6 +183,7 @@ export class UserController {
   findAll() {
     return this.userService.findAll();
   }
+
 
   /**
    * Likes user or removes like if already liked

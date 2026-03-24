@@ -13,6 +13,7 @@ export class HouseListingService {
   
   
   
+  
   constructor(private readonly db: PrismaService) {}
 
   // create a new house listing
@@ -65,6 +66,22 @@ export class HouseListingService {
       });
 
     }catch(error){
+      handlePrismaError(error)
+    }
+  }
+
+  async getLikes(idUser: number) {
+    try {
+      return await this.db.houseListing.findMany({
+        where:{
+          likedBy:{
+            some:{
+              userId:idUser
+            }
+          }
+        }
+      })
+    } catch (error) {
       handlePrismaError(error)
     }
   }

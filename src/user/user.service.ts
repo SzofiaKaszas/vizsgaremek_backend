@@ -26,6 +26,7 @@ import { CreateRatingDto, UpdateRatingDto } from './dto/create-rating.dto';
  */
 @Injectable()
 export class UserService {
+  
   constructor(private readonly db: PrismaService) {}
 
   //create a new user with hashed password
@@ -180,6 +181,30 @@ export class UserService {
     } catch (error) {
       handlePrismaError(error);
     }
+  }
+
+  async getLikes(idUser: number) {
+    console.log("Before try")
+    try {
+      console.log("entered service")
+      const likes = await this.db.user.findMany({
+        where:{
+          likedBy:{
+            some:{
+              likerId: idUser
+            }
+          }
+        },
+        omit:{
+          password: true
+        }
+      })
+      console.log("likes ran")
+      console.log(likes)
+      return likes
+    } catch (error) {
+      handlePrismaError(error)
+    };
   }
 
   async likeUser(liker: number, likedUserId: number) {

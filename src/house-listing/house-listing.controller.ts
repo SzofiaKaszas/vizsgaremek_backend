@@ -46,6 +46,16 @@ export class HouseListingController {
     }
   }
 
+  @Get('liked')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  getLikes(
+    @Request() request,
+  ){
+    const user = request.user as User
+    return this.houseListingService.getLikes(user.idUser)
+  }
+
   @Get(":id/all")
   findAll(@Param("id", ParseIntPipe) id: number) {
     return this.houseListingService.findAll(id);
@@ -56,6 +66,7 @@ export class HouseListingController {
     return this.houseListingService.findOne(id);
   }
 
+  
   @Post('like/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
