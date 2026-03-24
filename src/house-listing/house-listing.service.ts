@@ -21,6 +21,7 @@ export class HouseListingService {
       
       return await this.db.houseListing.create({
         data: {
+          houseIdUser: createHouseListingDto.houseIdUser,
           airConditioner: createHouseListingDto.airConditioner,
           bathrooms: createHouseListingDto.bathrooms,
           city : createHouseListingDto.city ,
