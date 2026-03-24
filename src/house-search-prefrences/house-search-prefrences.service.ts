@@ -75,7 +75,18 @@ export class HouseSearchPrefrencesService {
       })
       if(!userHousePrefrenc){throw new BadRequestException('User does not have HousePrefrenc')}
       if(!houseList){throw new InternalServerErrorException}
-      const scored = houseList.map((h) => {
+      const likedHouses = await this.db.likedHouse.findMany({
+        where:{
+          userId: id
+        },
+        select:{
+          houseId: true
+        }
+      })
+      const notAlreadyLiked = houseList.filter((h)=>{
+        return !likedHouses.some(l=>l.houseId === h.idHouse)
+      })
+      const scored = notAlreadyLiked.map((h) => {
         const candidate : HouseListing = h
         const score = houseScoringPercentage(userHousePrefrenc,candidate)
         return {houseListing : h, score: score}

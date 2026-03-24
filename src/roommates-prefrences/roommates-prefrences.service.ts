@@ -76,13 +76,30 @@ export class RoommatesPrefrencesService {
       console.log("Users to match with:")
       //console.log(usersRaw)
       // filter out users without roommatesPrefrences and compute mutual scores
+      const liked = await this.db.likedRoommate.findMany({
+        where:{
+          likerId: id
+        },
+        select:{
+          likedUserId: true
+        }
+      })
+      
+      console.log("Liked users:")
+
       const hasPref = usersRaw.filter((u)=>{
         const candidate = u as unknown as UserPlusPrefrenc;
         if(candidate.roommatesPrefrences){return candidate}
       })
+
+      const notAlreadyLiked = hasPref.filter((u)=>{
+        const candidate = u as unknown as UserPlusPrefrenc;
+        return !liked.some(l => l.likedUserId === candidate.idUser)
+      })
+
       console.log("Has Pref:")
       console.log(hasPref)
-      const scored = hasPref
+      const scored = notAlreadyLiked
         //.filter((u) => !!u.roommatesPrefrences)
         .map((u) => {
           const candidate = u as unknown as UserPlusPrefrenc;
