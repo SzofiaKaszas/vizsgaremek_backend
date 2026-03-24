@@ -57,7 +57,7 @@ async function main() {
         lookingForHouse: false,
         role: "user",
         userBio: "I am test user 1, looking for roommates.",
-        age: 25,
+        birthDay: faker.date.birthdate(),
         gender: "male",
         language: "English"
       }
@@ -66,6 +66,12 @@ async function main() {
       data:{
         user: {connect: {idUser: testUser1.idUser} },
         token: "test01token",
+      }
+    })
+    const testUser1Token2 = await tx.userToken.create({
+      data:{
+        user: {connect: {idUser: testUser1.idUser} },
+        token: "t1",
       }
     })
     const testUser1Preferences = await tx.roommatesPrefrences.create({
@@ -103,7 +109,7 @@ async function main() {
         lookingForHouse: false,
         role: "user",
         userBio: "I am test user 2, looking for roommates.",
-        age: 24,
+        birthDay: faker.date.birthdate(),
         gender: "male",
         language: "English"
       }
@@ -162,7 +168,7 @@ async function main() {
 
           //optional
           userBio: faker.person.bio(),
-          age: faker.number.int({min:18, max:80}),
+          birthDay: faker.date.birthdate(),
           gender: faker.person.gender(),
           language: faker.location.language().name,
           occupation: faker.person.jobTitle(),
@@ -278,6 +284,25 @@ async function main() {
         data:{
           user: {connect: {idUser: likerId} },
           house : {connect: {idHouse: likedHouseId} },
+        }
+      })
+    }
+
+    //RoommateRatings
+    const ratedRommates = new Set<string>();
+    for (let i = 0; i < userIds.length; i++){
+      const raterId = faker.helpers.arrayElement(userIds)
+      const ratedUserId = faker.helpers.arrayElement(userIds)
+      if(raterId == ratedUserId){continue}
+      const pairKey = `${raterId}-${ratedUserId}`
+      if(ratedRommates.has(pairKey)){continue}
+      ratedRommates.add(pairKey)
+      const xRating = await tx.roommateRatings.create({
+        data:{
+          ratingMessage: faker.lorem.sentence(),
+          ratingScore: faker.number.int({min: 1,max:5}),
+          raterId: raterId,
+          ratedUserId: ratedUserId
         }
       })
     }

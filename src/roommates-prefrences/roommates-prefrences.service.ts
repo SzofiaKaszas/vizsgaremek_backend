@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoommatesPrefrenceDto } from './dto/create-roommates-prefrence.dto';
 import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dto';
 import { PrismaService } from 'src/prisma.service';
 import { User } from 'generated/prisma/client';
 import { roommateScoringPercentige ,type UserPlusPrefrenc} from './roommate-scoring';
-import {handlePrismaError} from '../helperFunctions/helpers'
+import {discardFieldsNotMeantToBeChangedByUser, handlePrismaError} from '../helperFunctions/helpers'
 
 
 @Injectable()
@@ -24,7 +24,13 @@ export class RoommatesPrefrencesService {
   create(createRoommatesPrefrenceDto: CreateRoommatesPrefrenceDto, userId : number) {
     try{
       return this.db.roommatesPrefrences.create({
-        data: {...createRoommatesPrefrenceDto, user: {connect: {idUser: userId}}}
+        data: {
+          roommatesPrefrencesIdUser: userId,
+          gender : createRoommatesPrefrenceDto.gender ,
+          language : createRoommatesPrefrenceDto.language ,
+          maxAge : createRoommatesPrefrenceDto.maxAge ,
+          minAge : createRoommatesPrefrenceDto.minAge ,
+        }
         
       });
     }catch(error){
@@ -46,13 +52,14 @@ export class RoommatesPrefrencesService {
     const balanceMatchScores = 0.7 //The wheight to adjust how much the user's prefrenc matters compared to the potentilaMatches's prefrence (0 to 1)
     
     try{
-      const userToMatchRaw = await this.db.user.findUnique({
+      const userToMatchRaw = await this.db.user.findUniqueOrThrow({
         where: { idUser: id },
         include: { roommatesPrefrences: true },
       });
   
       if (!userToMatchRaw || !userToMatchRaw.roommatesPrefrences) {
-        return [];
+        return []
+        throw new NotFoundException("No User or User does not have roommatePrefrences")
       }
   
       // ensure types for scoring function (it expects UserPlusPrefrenc)
@@ -69,10 +76,34 @@ export class RoommatesPrefrencesService {
       console.log("Users to match with:")
       //console.log(usersRaw)
       // filter out users without roommatesPrefrences and compute mutual scores
-      const scored = usersRaw
+      const liked = await this.db.likedRoommate.findMany({
+        where:{
+          likerId: id
+        },
+        select:{
+          likedUserId: true
+        }
+      })
+      
+      console.log("Liked users:")
+
+      const hasPref = usersRaw.filter((u)=>{
+        const candidate = u as unknown as UserPlusPrefrenc;
+        if(candidate.roommatesPrefrences){return candidate}
+      })
+
+      const notAlreadyLiked = hasPref.filter((u)=>{
+        const candidate = u as unknown as UserPlusPrefrenc;
+        return !liked.some(l => l.likedUserId === candidate.idUser)
+      })
+
+      console.log("Has Pref:")
+      console.log(hasPref)
+      const scored = notAlreadyLiked
         //.filter((u) => !!u.roommatesPrefrences)
         .map((u) => {
           const candidate = u as unknown as UserPlusPrefrenc;
+          
           console.log("Candidate:")
           console.log(candidate)
           const scoreA = roommateScoringPercentige(userToMatch, candidate); // user -> candidate
@@ -88,10 +119,11 @@ export class RoommatesPrefrencesService {
         'idUser',
         'firstName',
         'lastName',
-        'age',
+        'birthDay',
         'gender',
         'language',
         'email',
+        'userBio'
       ];
   
       return scored.map((s) => {
@@ -130,7 +162,7 @@ export class RoommatesPrefrencesService {
   findOne(id: number) {
     try{
       return this.db.roommatesPrefrences.findUniqueOrThrow({
-        where: { idRoommatesPrefrences: id },
+        where: { roommatesPrefrencesIdUser : id },
       });
     }catch(error){
       handlePrismaError(error)
@@ -144,9 +176,10 @@ export class RoommatesPrefrencesService {
    */
   update(id: number, updateRoommatesPrefrenceDto: UpdateRoommatesPrefrenceDto) {
     try{
+      const dtoData = discardFieldsNotMeantToBeChangedByUser(updateRoommatesPrefrenceDto,'roommatePrefrences')
       return this.db.roommatesPrefrences.update({
         where: { roommatesPrefrencesIdUser: id },
-        data: updateRoommatesPrefrenceDto,
+        data: dtoData,
       });
     }catch(error){
       handlePrismaError(error)

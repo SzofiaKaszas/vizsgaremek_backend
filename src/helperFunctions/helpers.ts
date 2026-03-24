@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { User } from "generated/prisma/client";
 import { Prisma } from 'generated/prisma/client';
+import {houseListingAllowedFields,housePrefrencAllowedFields,ratingAllowedFields,roommatePrefrencAllowedFields,userAllowedFields} from './userOnlyFields'
 
 
 
@@ -88,4 +89,71 @@ function isSoonerInList(orderedList : any[], value: any, beforeThanThis : any) :
   return valueIndex <= beforeThanThisIndex
 }
 
-export{/*checkauthorization,*/ isAdmin, isAuthorized, handlePrismaError, calculateOutsidePreferencePercentage, isSoonerInList}
+function getAgeFromBirthdate(birthdate: string | number | Date | null | undefined): number | null {
+  if (!birthdate) {
+    return null;
+  }
+
+  const today = new Date();
+  const birth = new Date(birthdate);
+
+  let age = today.getFullYear() - birth.getFullYear();
+
+  const hasHadBirthdayThisYear =
+    today.getMonth() > birth.getMonth() ||
+    (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
+
+  if (!hasHadBirthdayThisYear) {
+    age--;
+  }
+
+  return age;
+}
+
+function discardFieldsNotMeantToBeChangedByUser<Dto extends object>(
+  dto: Dto | null | undefined,
+  whichTable: "user" | "houseListing" | "houseSearchPrefrences" | "roommatePrefrences" | "rating",
+): Partial<Dto> {
+  if (!dto) {
+    return {};
+  }
+
+  const data: Partial<Dto> = {};
+  const dtoAny = dto as Record<string, unknown>;
+  let allowedFields: string[] = [];
+  switch (whichTable) {
+    case "user":
+      allowedFields = userAllowedFields;
+      break;
+    case "houseListing":
+      allowedFields = houseListingAllowedFields;
+      break;
+    case "houseSearchPrefrences":
+      allowedFields = housePrefrencAllowedFields;
+      break;
+    case "roommatePrefrences":
+      allowedFields = roommatePrefrencAllowedFields;
+      break;
+    case "rating":
+      allowedFields = ratingAllowedFields;
+      break;
+    default:
+      allowedFields = [];
+      break;
+  }
+
+  if (allowedFields.length === 0) {
+    throw Error('discardFieldsNotMeantToBeChangedByUser was called with icorrect whichTable');
+  }
+
+  for (const field of allowedFields) {
+    const key = field as keyof Dto;
+    if (dtoAny[field] !== undefined) {
+      data[key] = dtoAny[field] as Dto[keyof Dto];
+    }
+  }
+
+  return data;
+}
+
+export{/*checkauthorization,*/ isAdmin, isAuthorized, handlePrismaError, calculateOutsidePreferencePercentage, isSoonerInList, getAgeFromBirthdate, discardFieldsNotMeantToBeChangedByUser}

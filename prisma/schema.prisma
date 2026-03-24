@@ -57,15 +57,16 @@ model User {
 
   //optional fields if you are looking for roommates
   userBio         String?
-  age             Int? //Change to birthdate
+  birthDay        DateTime?
   gender          String? //maybe enum later
   language        String?
   occupation      String?
   connectionEmail String? //contactemail (the right word)
+  rating          Float?
 
-  hasHouse         Boolean
-  lookingForPeople Boolean
-  lookingForHouse  Boolean
+  hasHouse         Boolean @default(false)
+  lookingForPeople Boolean @default(false)
+  lookingForHouse  Boolean @default(false)
 
   role String @default("user")
 
@@ -74,9 +75,13 @@ model User {
   roommatesPrefrences RoommatesPrefrences?
   houses              HouseListing[]
   houseSearchPrefrences HouseSearchPrefrences?
-  likedRoommates      LikedRoommate[]        @relation("UserLikes")
-  likedBy             LikedRoommate[]        @relation("UserLikedBy")
-  likedHouses         LikedHouse[]
+  likedRoommates      LikedRoommate[]        @relation("UserRoommateLikes")
+  likedBy             LikedRoommate[]        @relation("UserRoommateLikedBy")
+  ratedRoommates      RoommateRatings[]      @relation("UserRoommateRatings")
+  ratedBy             RoommateRatings[]      @relation("UserRoommateRatedBy")
+  likedHouses         LikedHouse[]           @relation("UserHouseListingLikes")
+  ratedHouses         HouseListingRatings[]    @relation("UserHouseListingRatings")
+
 }
 
 //UserToken Model to store user authentication tokens (done)
@@ -109,10 +114,27 @@ model LikedRoommate {
   likerId     Int
   likedUserId Int
   createdAt   DateTime @default(now())
-  liker       User     @relation("UserLikes", fields: [likerId], references: [idUser], onDelete: Cascade)
-  liked       User     @relation("UserLikedBy", fields: [likedUserId], references: [idUser], onDelete: Cascade)
+  liker       User     @relation("UserRoommateLikes", fields: [likerId], references: [idUser], onDelete: Cascade)
+  liked       User     @relation("UserRoommateLikedBy", fields: [likedUserId], references: [idUser], onDelete: Cascade)
 
   @@unique([likerId, likedUserId])
+}
+
+model RoommateRatings {
+  id Int @id @default(autoincrement())
+  raterId Int
+  ratedUserId Int
+
+  ratingScore Int // 1 to 5 starts
+  ratingMessage String
+
+  approved Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  rater User @relation("UserRoommateRatings",fields: [raterId], references: [idUser], onDelete: Cascade)
+  rated User @relation("UserRoommateRatedBy",fields: [ratedUserId], references: [idUser], onDelete: Cascade)
+
+  @@unique([raterId,ratedUserId])
 }
 
 //RoommatesPrefrences Model to store user prefrences for roommates (maybe add more fields later)
@@ -153,7 +175,8 @@ model HouseListing {
   user User? @relation(fields: [houseIdUser], references: [idUser]) //relation to User model but not everyone has a listing
 
   //images HouseImage[]
-  likedBy LikedHouse[]
+  likedBy LikedHouse[] @relation("HouseListingLikedBy")
+  ratedBy HouseListingRatings[] @relation("HouseListingRatedBy")
 }
 
 /**
@@ -194,8 +217,26 @@ model LikedHouse {
   userId    Int
   houseId   Int
   createdAt DateTime     @default(now())
-  user      User         @relation(fields: [userId], references: [idUser], onDelete: Cascade)
-  house     HouseListing @relation(fields: [houseId], references: [idHouse], onDelete: Cascade)
+  user      User         @relation("UserHouseListingLikes",fields: [userId], references: [idUser], onDelete: Cascade)
+  house     HouseListing @relation("HouseListingLikedBy",fields: [houseId], references: [idHouse], onDelete: Cascade)
 
   @@unique([userId, houseId])
+}
+
+
+model HouseListingRatings {
+  id Int @id @default(autoincrement())
+  raterId Int
+  ratedHouseId Int
+
+  ratingScore Int // 1 to 5 starts
+  ratingMessage String
+
+  approved Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  rater User @relation("UserHouseListingRatings",fields: [raterId], references: [idUser], onDelete: Cascade)
+  rated HouseListing @relation("HouseListingRatedBy",fields: [ratedHouseId], references: [idHouse], onDelete: Cascade)
+
+  @@unique([raterId,ratedHouseId])
 }

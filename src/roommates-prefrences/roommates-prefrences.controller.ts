@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe } from '@nestjs/common';
 import { RoommatesPrefrencesService } from './roommates-prefrences.service';
 import { CreateRoommatesPrefrenceDto } from './dto/create-roommates-prefrence.dto';
 import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dto';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiUnauthorizedResponse} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import{RoommatesPrefrencesBaseDto} from './responsDto/response'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { RoommatesPrefrences, User } from 'generated/prisma/client';
 
 @Controller('roommates-prefrences')
@@ -88,7 +89,6 @@ export class RoommatesPrefrencesController {
    * 
    */
   @Get('getmatches')
-  
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   @ApiOkResponse({
@@ -111,8 +111,8 @@ export class RoommatesPrefrencesController {
     const user = request.user as User;
     //console.log("------------------")
     //console.log(user)
-    const matches : User[] =  await this.roommatesPrefrencesService.getMatches(user.idUser);
-    return matches;
+    
+    return await this.roommatesPrefrencesService.getMatches(user.idUser);
   }
 
   //TODO: get pref by token/users id*/
@@ -149,8 +149,8 @@ export class RoommatesPrefrencesController {
     description: 'Returns the preference record with the given id',
     type: RoommatesPrefrencesBaseDto,
   })
-  findOne(@Param('id') id: string) {
-    return this.roommatesPrefrencesService.findOne(+id);
+  findOne(@Param('id',ParseIntPipe) id: number) {
+    return this.roommatesPrefrencesService.findOne(id);
   }
   /**
    * Updates a preference record by id

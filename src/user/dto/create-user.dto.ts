@@ -1,13 +1,15 @@
 /* eslint-disable no-useless-escape */
 import {
   IsBoolean,
+  //IsDate,
+  IsDateString,
   IsEmail,
-  IsInt,
+  //IsInt,
   IsNotEmpty,
   IsOptional,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   IsPhoneNumber,
-  IsPositive,
+  //IsPositive,
   IsString,
   Matches,
 } from 'class-validator';
@@ -66,14 +68,15 @@ export class CreateUserDto {
   userBio?: string;
 
 
+
+
   /**
-   * Age of the user in years.
-   * @example 25
+   * Birthday as date
+   * 
    */
   @IsOptional()
-  @IsInt()
-  @IsPositive() //age must be positive
-  age?: number;
+  @IsDateString()
+  birthDay? : string
 
   /**
    * Gender of the user.
