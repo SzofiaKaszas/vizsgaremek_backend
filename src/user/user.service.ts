@@ -184,9 +184,9 @@ export class UserService {
   }
 
   async getLikes(idUser: number) {
-    console.log("Before try")
+    
     try {
-      console.log("entered service")
+      
       const likes = await this.db.user.findMany({
         where:{
           likedBy:{
@@ -199,8 +199,7 @@ export class UserService {
           password: true
         }
       })
-      console.log("likes ran")
-      console.log(likes)
+      
       return likes
     } catch (error) {
       handlePrismaError(error)

@@ -21,6 +21,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'generated/prisma/client';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {UserBaseDto,UserBaseUpdateDto,UserNecessaryDto} from "./responsDto/responseUserDto"
 import {isAuthorized} from "../helperFunctions/helpers"
 import { CreateRatingDto, UpdateRatingDto } from './dto/create-rating.dto';
@@ -134,7 +135,6 @@ export class UserController {
   getLikes(
     @Request() request,
   ){
-    console.log("getLikes runing")
     const user = request.user as User
     return this.userService.getLikes(user.idUser)
   }
