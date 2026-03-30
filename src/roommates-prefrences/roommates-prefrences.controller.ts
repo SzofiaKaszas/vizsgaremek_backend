@@ -14,16 +14,18 @@ export class RoommatesPrefrencesController {
   constructor(private readonly roommatesPrefrencesService: RoommatesPrefrencesService) {}
 
   /**
-   * Creates new prefrences for user and connects it to the user by userId
-   * @param createRoommatesPrefrenceDto  Data for creating the prefrences
-   * @param userId  User's id to connect the prefrences to
-   * @returns {RoommatesPrefrences}
+   * Creates new preferences for user and connects it to the user by userId
+   * @param createRoommatesPrefrenceDto Data for creating the preferences
+   * @param request Request object containing user authentication
+   * @returns Newly created preference record
+   * @throws {ConflictException} User already has preferences
    * @throws {BadRequestException} Bad request
-   * @throws {NotFoundException} User not found
-   * @throws {InternalServerErrorException} Database opperation failed
+   * @throws {UnauthorizedException} User not authenticated
+   * @throws {InternalServerErrorException} Database operation failed
    */
   @Post("add")
   @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
   @ApiCreatedResponse({
     description: 'Returns the newly created preference record',
     type: RoommatesPrefrencesBaseDto,
@@ -38,16 +40,8 @@ export class RoommatesPrefrencesController {
     description: 'Bad request',
   })
   @ApiUnauthorizedResponse({
-    description:'Unauthorized',
-  })
-  @UseGuards(AuthGuard('bearer'))
-  @ApiBadRequestResponse({
-    description: 'Bad request',
-  })
-  @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
-  @UseGuards(AuthGuard('bearer'))
   create(
     @Body() createRoommatesPrefrenceDto: CreateRoommatesPrefrenceDto,
     @Request() request
@@ -56,15 +50,14 @@ export class RoommatesPrefrencesController {
     return this.roommatesPrefrencesService.create(createRoommatesPrefrenceDto, user.idUser);
   }
   /**
-   * all preference data
-   * @returns  returns an array of all preferenc records with all data
-   * @throws {InternalServerErrorException} Database opperation failed
+   * Returns all preference records
+   * @returns Array of all preference records with all data
    * @throws {BadRequestException} Bad request
-   * @throws {NotFoundException} Record not found
+   * @throws {InternalServerErrorException} Database operation failed
    */
   @Get()
   @ApiOkResponse({
-    description: 'Returns an array of all preferenc records with all data',
+    description: 'Returns an array of all preference records with all data',
     type: [RoommatesPrefrencesBaseDto],
     isArray: true,
   })
@@ -78,21 +71,20 @@ export class RoommatesPrefrencesController {
     return this.roommatesPrefrencesService.findAll();
   }
   /**
-   *  Finds a specific preference record by id
-   * @param id idRoommatesPrefrences
-   * @returns  returns a specific preference record by id
-   * @param request  Request object containing the user's token for authentication
+   * Returns roommate matches based on the current user's preferences
+   * Sorted by how well they match with the user
+   * @param request Request object containing user authentication
+   * @returns Array of matching users sorted by match quality
+   * @throws {UnauthorizedException} User not authenticated  
+   * @throws {ForbiddenException} Invalid token
    * @throws {BadRequestException} Bad request
-   * @throws {NotFoundException} Record not found 
-   * @throws {InternalServerErrorException} Database opperation failed
-   * 
-   * 
+   * @throws {InternalServerErrorException} Database operation failed
    */
   @Get('getmatches')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   @ApiOkResponse({
-    description: 'Returns an array of users that are sorted by how good they match with the user with the given id, the array can be empty if there are no other users or if the user with the given id has no prefrences',
+    description: 'Returns an array of users that are sorted by how good they match with the user with the given id, the array can be empty if there are no other users or if the user with the given id has no preferences',
     type: [RoommatesPrefrencesBaseDto],
     isArray: true,
   })
@@ -105,25 +97,12 @@ export class RoommatesPrefrencesController {
   @ApiUnauthorizedResponse({
     description: 'No authorization',
   })
-
   async getMatches(@Request() request) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const user = request.user as User;
-    //console.log("------------------")
-    //console.log(user)
     
     return await this.roommatesPrefrencesService.getMatches(user.idUser);
   }
-
-  //TODO: get pref by token/users id*/
-  /**
-   *Finds a specific preference record by id
-   * @param id idRoommatesPrefrences
-   * @returns  returns a specific preference record by id
-   * @throws {BadRequestException} Bad request
-   * @throws {NotFoundException} Record not found
-   * @throws {InternalServerErrorException} Database opperation failed
-   */
   @Get(':id')
   @ApiParam({
     name: 'id',
@@ -143,25 +122,33 @@ export class RoommatesPrefrencesController {
     description: 'Bad request (id is int)',
   })
   @ApiInternalServerErrorResponse({
-    description: 'Database opperation failed',
+    description: 'Database operation failed',
   })
-  @ApiOkResponse({
-    description: 'Returns the preference record with the given id',
-    type: RoommatesPrefrencesBaseDto,
-  })
+  
+  /**
+   * Finds a specific preference record by ID
+   * @param id Preference record ID
+   * @returns Preference record with the given ID
+   * @throws {BadRequestException} Bad request (id must be int)
+   * @throws {NotFoundException} Preference record not found with ID
+   * @throws {InternalServerErrorException} Database operation failed
+   */
   findOne(@Param('id',ParseIntPipe) id: number) {
     return this.roommatesPrefrencesService.findOne(id);
   }
   /**
-   * Updates a preference record by id
-   * @param id idRoommatesPrefrences
-   * @param updateRoommatesPrefrenceDto 
-   * @returns  Updated preference record
+   * Updates a preference record by ID
+   * @param id Preference record ID
+   * @param updateRoommatesPrefrenceDto Updated preference data
+   * @returns Updated preference record
    * @throws {BadRequestException} Bad request
-   * @throws {NotFoundException} Record not found
-   * @throws {InternalServerErrorException} Database opperation failed
+   * @throws {NotFoundException} Preference record not found
+   * @throws {ForbiddenException} Invalid token
+   * @throws {InternalServerErrorException} Database operation failed
    */
   @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
   @ApiParam({
     name: 'id',
     description: 'The id of the preference record to update',
@@ -171,40 +158,38 @@ export class RoommatesPrefrencesController {
   @ApiBody({
     type: UpdateRoommatesPrefrenceDto,
   })
-  
-  /*@ApiiOkResponse({
+  @ApiOkResponse({
     description: 'Returns the updated preference record',
     type: RoommatesPrefrencesBaseDto,
-  })*/
+  })
   @ApiNotFoundResponse({
     description: 'No preference record found with id',
   })
- 
-  
   @ApiBadRequestResponse({
     description: 'Bad request',
   })
   @ApiInternalServerErrorResponse({
-    description: 'Database opperation failed',
+    description: 'Database operation failed',
   })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('bearer'))
   @ApiForbiddenResponse({
-      description: 'Invalid token,'
-    })
-    
+    description: 'Invalid token'
+  })
   update(@Param('id') id: string, @Body() updateRoommatesPrefrenceDto: UpdateRoommatesPrefrenceDto) {
     return this.roommatesPrefrencesService.update(+id, updateRoommatesPrefrenceDto);
   }
   /**
-   * Deletes a preference record by id
-   * @param id idRoommatesPrefrences
-   * @returns  the deleted record
-   * @throws {BadRequestException} Bad request
-   * @throws {NotFoundException} Record not found
-   * @throws {InternalServerErrorException} Database opperation failed
+   * Deletes a preference record by ID
+   * @param id Preference record ID
+   * @returns Deleted preference record
+   * @throws {BadRequestException} Bad request (id must be int)
+   * @throws {NotFoundException} Preference record not found
+   * @throws {ForbiddenException} Invalid token
+   * @throws {UnauthorizedException} Not authorized to delete this record
+   * @throws {InternalServerErrorException} Database operation failed
    */
   @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
   @ApiParam({
     name: 'id',
     example: 1,
@@ -216,26 +201,17 @@ export class RoommatesPrefrencesController {
     type: RoommatesPrefrencesBaseDto,
   })
   @ApiBadRequestResponse({
-    description: 'Bad request',
+    description: 'Bad request (id is int)',
   })
   @ApiInternalServerErrorResponse({
-    description: 'Database opperation failed',
-  })  
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('bearer'))
-  
+    description: 'Database operation failed',
+  })
   @ApiForbiddenResponse({
-      description: 'Invalid token,'
-    })
+    description: 'Invalid token'
+  })
   @ApiUnauthorizedResponse({
-      description:'Not authorized for deleting this record',
-    })
-    @ApiBadRequestResponse({
-      description: 'Bad request (id is int)',
-    })
-    
-  
-    
+    description: 'Not authorized for deleting this record',
+  })
   remove(@Param('id') id: string) {
     return this.roommatesPrefrencesService.remove(+id);
   }
