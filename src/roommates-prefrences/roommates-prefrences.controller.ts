@@ -16,7 +16,6 @@ export class RoommatesPrefrencesController {
   /**
    * Creates new preferences for user and connects it to the user by userId
    * @param createRoommatesPrefrenceDto Data for creating the preferences
-   * @param request Request object containing user authentication
    * @returns Newly created preference record
    * @throws {ConflictException} User already has preferences
    * @throws {BadRequestException} Bad request
@@ -73,7 +72,6 @@ export class RoommatesPrefrencesController {
   /**
    * Returns roommate matches based on the current user's preferences
    * Sorted by how well they match with the user
-   * @param request Request object containing user authentication
    * @returns Array of matching users sorted by match quality
    * @throws {UnauthorizedException} User not authenticated  
    * @throws {ForbiddenException} Invalid token
@@ -139,7 +137,7 @@ export class RoommatesPrefrencesController {
   /**
    * Updates a preference record by ID
    * @param id Preference record ID
-   * @param updateRoommatesPrefrenceDto Updated preference data
+   * @body updateRoommatesPrefrenceDto Updated preference data
    * @returns Updated preference record
    * @throws {BadRequestException} Bad request
    * @throws {NotFoundException} Preference record not found

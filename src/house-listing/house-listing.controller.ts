@@ -19,7 +19,6 @@ export class HouseListingController {
   /**
    * Creates a new house listing
    * @param createHouseListingDto Data for creating the house listing
-   * @param request Request object containing user authentication
    * @returns Created house listing
    * @throws {ConflictException} House listing with same unique data already exists
    * @throws {BadRequestException} Bad request
@@ -62,7 +61,6 @@ export class HouseListingController {
 
   /**
    * Returns all house listings liked by the current user
-   * @param request Request object containing user authentication
    * @returns Array of liked house listings
    */
   @Get('liked')
@@ -146,7 +144,6 @@ export class HouseListingController {
   /**
    * Likes a house listing or removes the like if already liked
    * @param id House listing ID
-   * @param request Request object containing user authentication
    * @param res Response object to send custom status codes
    * @returns Like action result (created or deleted)
    * @throws {BadRequestException} Bad request (id must be int)
@@ -195,7 +192,6 @@ export class HouseListingController {
    * Creates a rating for a house listing
    * @param id House listing ID
    * @param createRatingDto Rating data
-   * @param request Request object containing user authentication
    * @returns Created rating
    * @throws {BadRequestException} Bad request
    * @throws {UnauthorizedException} User not authenticated
@@ -242,7 +238,6 @@ export class HouseListingController {
    * Updates a rating for a house listing
    * @param id House listing ID
    * @param updateRatingDto Updated rating data
-   * @param request Request object containing user authentication
    * @returns Updated rating
    * @throws {BadRequestException} Bad request
    * @throws {UnauthorizedException} User not authenticated
@@ -289,8 +284,7 @@ export class HouseListingController {
   /**
    * Updates a house listing by ID
    * @param id House listing ID
-   * @param updateHouseListingDto Updated house listing data
-   * @param request Request object containing user authentication
+   * @para updateHouseListingDto Updated house listing data
    * @returns Updated house listing
    * @throws {BadRequestException} Bad request or missing houseIdUser
    * @throws {UnauthorizedException} User not authorized to update this listing
@@ -347,7 +341,6 @@ export class HouseListingController {
   /**
    * Deletes a house listing by ID
    * @param id House listing ID
-   * @param request Request object containing user authentication
    * @returns Deleted house listing
    * @throws {BadRequestException} Bad request (id must be int)
    * @throws {UnauthorizedException} User not authorized to delete this listing
