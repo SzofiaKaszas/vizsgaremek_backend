@@ -118,7 +118,7 @@ export class UserService {
   async getNecessary(id: number) {
     try {
       return await this.db.user.findUniqueOrThrow({
-        where: { idUser: id },
+        where: { idUser: id, role: "user" },
         select: {
           idUser: true,
           firstName: true,
@@ -146,7 +146,7 @@ export class UserService {
   async findOne(id: number) {
     try {
       return await this.db.user.findUniqueOrThrow({
-        where: { idUser: id },
+        where: { idUser: id,role: "user" },
         omit: { password: true },
       });
     } catch (error) {
@@ -164,7 +164,7 @@ export class UserService {
    */
   async findAll() {
     try {
-      return await this.db.user.findMany({ omit: { password: true } });
+      return await this.db.user.findMany({ where:{role: "user"},omit: { password: true } });
     } catch (error) {
       handlePrismaError(error);
     }
@@ -180,7 +180,8 @@ export class UserService {
             some:{
               likerId: idUser
             }
-          }
+          },
+          role: "user"
         },
         omit:{
           password: true
@@ -204,6 +205,8 @@ export class UserService {
           },
         },
       });
+      const likedUser = await this.db.user.findUnique({where:{idUser: likedUserId}})
+      if(!likedUser || likedUser.role != "user"){throw new NotFoundException}
       //console.log(`isAlredyLiked ${isAlreadyLiked? "true": "flase"}`)
       if (isAlreadyLiked) {
         const deletedLike = await this.db.likedRoommate.delete({
