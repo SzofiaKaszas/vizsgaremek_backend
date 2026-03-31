@@ -307,6 +307,24 @@ async function main() {
       })
     }
 
+    const ratedHouses = new Set<string>();
+    for (let i = 0; i < userIds.length; i++){
+      const raterId = faker.helpers.arrayElement(userIds)
+      const ratedHouseId = faker.helpers.arrayElement(houseListingIds)
+      if(raterId == ratedHouseId){continue}
+      const pairKey = `${raterId}-${ratedHouseId}`
+      if(ratedHouses.has(pairKey)){continue}
+      ratedHouses.add(pairKey)
+      const xRating = await tx.houseListingRatings.create({
+        data:{
+          ratingMessage: faker.lorem.sentence(),
+          ratingScore: faker.number.int({min: 1,max:5}),
+          raterId: raterId,
+          ratedHouseId: ratedHouseId
+        }
+      })
+    }
+
 
 
     
