@@ -94,4 +94,22 @@ export class UserTokenService {
       handlePrismaError(error)
     }
   }
+
+  /**
+   * Finds a user by their email address
+   * !RETURNS PASSWORD! DO NOT SEND IT TO USER WITH THE PASSWORD
+   *
+   * @param email User's email address
+   * @throws {BadRequestException} Bad request
+   * @throws {NotFoundException} User not found
+   * @throws {InternalServerErrorException} Database opperation failed
+   * @returns the user record associated with the email, or null if not found
+   */
+  async findByEmail(email: string) {
+    try {
+      return await this.db.user.findUniqueOrThrow({ where: { email: email,}, omit:{password:false} });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
 }

@@ -41,6 +41,34 @@ enum KitchenLevel {
   full
 }
 
+enum UserGender {
+  female
+  male
+  other
+}
+
+enum UserPrefGender {
+  female
+  male
+  other
+  any
+}
+
+enum Language {
+  English
+  Hungarian
+  Spanish
+  French
+  German
+  Polish
+  Portuguese
+  Italian
+  Chinese
+  Japanese
+  Korean
+  Other
+}
+
 // ------------------ Models ------------------
 
 //User Model to store user profile information 
@@ -58,11 +86,11 @@ model User {
   //optional fields if you are looking for roommates
   userBio         String?
   birthDay        DateTime?
-  gender          String? //maybe enum later
-  language        String?
+  gender          UserGender? //maybe enum later
+  language        Language?
   occupation      String?
   connectionEmail String? //contactemail (the right word)
-  rating          Float?
+  rating          Float? 
 
   hasHouse         Boolean @default(false)
   lookingForPeople Boolean @default(false)
@@ -146,8 +174,8 @@ model RoommatesPrefrences {
   //optional fields cus the user might not want to set any prefrences
   minAge   Int?
   maxAge   Int?
-  gender   String?
-  language String?
+  gender   UserPrefGender?
+  language Language?
 
   user User? @relation(fields: [roommatesPrefrencesIdUser], references: [idUser]) //relation to User model but not everyone is looking for roommates
 }

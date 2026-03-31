@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -20,6 +21,7 @@ import {
   discardFieldsNotMeantToBeChangedByUser,
 } from '../helperFunctions/helpers';
 import { CreateRatingDto, UpdateRatingDto } from './dto/create-rating.dto';
+import { Language,UserGender } from "generated/prisma/enums";
 
 /**
  * The user handler class
@@ -59,10 +61,11 @@ export class UserService {
           phoneNumber: newUser.phoneNumber,
           birthDay: newUser.birthDay,
           connectionEmail: newUser.connectionEmail,
-          gender: newUser.gender,
-          language: newUser.language,
+          gender: newUser.gender as UserGender,
+          language: newUser.language as Language,
           occupation: newUser.occupation,
           userBio: newUser.userBio,
+          role:'user'
         },
         omit: {
           password: true,
@@ -101,23 +104,7 @@ export class UserService {
     }
   }
 
-  /**
-   * Finds a user by their email address
-   * !RETURNS PASSWORD! DO NOT SEND IT TO USER WITH THE PASSWORD
-   *
-   * @param email User's email address
-   * @throws {BadRequestException} Bad request
-   * @throws {NotFoundException} User not found
-   * @throws {InternalServerErrorException} Database opperation failed
-   * @returns the user record associated with the email, or null if not found
-   */
-  async findByEmail(email: string) {
-    try {
-      return await this.db.user.findUniqueOrThrow({ where: { email: email }, omit:{password:false} });
-    } catch (error) {
-      handlePrismaError(error);
-    }
-  }
+  
 
   /**
    * get one user by id with necessary data

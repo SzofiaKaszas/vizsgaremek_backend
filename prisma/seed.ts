@@ -8,7 +8,7 @@ import { faker } from '@faker-js/faker'
 import dotenv from 'dotenv'
 import * as argon2 from 'argon2';
 
-import { FurnishingLevel,HeatingType,KitchenLevel,PropertyType } from "../generated/prisma/enums"
+import { FurnishingLevel,HeatingType,KitchenLevel,PropertyType,Language,UserGender,UserPrefGender } from "../generated/prisma/enums"
 
 dotenv.config()
 const prisma = new PrismaClient()
@@ -169,8 +169,8 @@ async function main() {
           //optional
           userBio: faker.person.bio(),
           birthDay: faker.date.birthdate(),
-          gender: faker.person.gender(),
-          language: faker.location.language().name,
+          gender: faker.helpers.arrayElement(Object.values(UserGender).filter(v => typeof v === 'string')),
+          language: faker.helpers.arrayElement(Object.values(Language).filter(v => typeof v === 'string')),
           occupation: faker.person.jobTitle(),
           connectionEmail:faker.internet.email()
 
@@ -214,8 +214,8 @@ async function main() {
           user: {connect: {idUser: userIds[i]} },
           minAge:faker.number.int({min:16, max:25 }),
           maxAge:faker.number.int({min:25, max:99 }),
-          gender:faker.person.gender(),
-          language:faker.location.language().name
+          gender: faker.helpers.arrayElement(Object.values(UserGender).filter(v => typeof v === 'string')),
+          language: faker.helpers.arrayElement(Object.values(Language).filter(v => typeof v === 'string')),
 
         }
       })

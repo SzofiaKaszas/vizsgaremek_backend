@@ -1,4 +1,5 @@
-import { IsNumber, IsString, Min, min } from "class-validator";
+import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, Min, min } from "class-validator";
+import { Language,UserPrefGender } from "generated/prisma/enums";
 
 export class CreateRoommatesPrefrenceDto {
  
@@ -7,6 +8,9 @@ export class CreateRoommatesPrefrenceDto {
    * @example 18
    */
   @IsNumber()
+  @IsOptional()
+  @IsInt()
+  @Min(18)
   minAge?: number;
   /**
    * Maximum age of the preferred roommate.
@@ -14,6 +18,9 @@ export class CreateRoommatesPrefrenceDto {
    * 
    */
   @IsNumber()
+  @IsOptional()
+  @IsInt()
+  @Max(100)
   maxAge?: number;
  
   
@@ -22,11 +29,15 @@ export class CreateRoommatesPrefrenceDto {
    * @example "female"
    */
   @IsString()
-  gender?: string; //maybe enum later
+  @IsOptional()
+  @IsEnum(UserPrefGender)
+  gender?: UserPrefGender; //maybe enum later
   /**
    * Preferred language of the roommate.
    * @example "en"
-   */
+  */
+  @IsOptional()
+  @IsEnum(Language)
   @IsString()
-  language?: string;
+  language?: Language;
 }

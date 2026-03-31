@@ -67,7 +67,7 @@ export class UserTokenController {
   @ApiForbiddenResponse({ description: 'Invalid email or password' })
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
-    const user = await this.userService.findByEmail(loginDto.email);
+    const user = await this.userTokenService.findByEmail(loginDto.email);
     if (user === null) {
       throw new ForbiddenException('Invalid email or password');
     }

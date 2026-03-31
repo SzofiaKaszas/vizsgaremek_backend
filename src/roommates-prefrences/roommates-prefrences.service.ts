@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoommatesPrefrenceDto } from './dto/create-roommates-prefrence.dto';
 import { UpdateRoommatesPrefrenceDto } from './dto/update-roommates-prefrence.dto';
@@ -5,6 +6,7 @@ import { PrismaService } from 'src/prisma.service';
 import { User } from 'generated/prisma/client';
 import { roommateScoringPercentige ,type UserPlusPrefrenc} from './roommate-scoring';
 import {discardFieldsNotMeantToBeChangedByUser, handlePrismaError} from '../helperFunctions/helpers'
+import { Language,UserPrefGender } from "generated/prisma/enums";
 
 
 @Injectable()
@@ -26,8 +28,8 @@ export class RoommatesPrefrencesService {
       return this.db.roommatesPrefrences.create({
         data: {
           roommatesPrefrencesIdUser: userId,
-          gender : createRoommatesPrefrenceDto.gender ,
-          language : createRoommatesPrefrenceDto.language ,
+          gender : createRoommatesPrefrenceDto.gender as UserPrefGender,
+          language : createRoommatesPrefrenceDto.language as Language,
           maxAge : createRoommatesPrefrenceDto.maxAge ,
           minAge : createRoommatesPrefrenceDto.minAge ,
         }
@@ -69,8 +71,9 @@ export class RoommatesPrefrencesService {
 
 
       const usersRaw = await this.db.user.findMany({
-        where: { idUser: { not: id } },
+        where: { idUser: { not: id }, NOT:{role:"admin"} },
         include: { roommatesPrefrences: true },
+        
       });
       
       //console.log("Users to match with:")

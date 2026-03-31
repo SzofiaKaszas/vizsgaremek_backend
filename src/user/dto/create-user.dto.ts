@@ -4,6 +4,7 @@ import {
   //IsDate,
   IsDateString,
   IsEmail,
+  IsEnum,
   //IsInt,
   IsNotEmpty,
   IsOptional,
@@ -13,6 +14,8 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
+
+import { Language,UserGender } from "generated/prisma/enums";
 
 export class CreateUserDto {
   /**
@@ -84,7 +87,8 @@ export class CreateUserDto {
    */
   @IsOptional()
   @IsString()
-  gender?: string; //maybe enum later
+  @IsEnum(UserGender)
+  gender?: UserGender; //maybe enum later
 
 
   /**
@@ -93,7 +97,8 @@ export class CreateUserDto {
    */
   @IsOptional()
   @IsString()
-  language?: string;
+  @IsEnum(Language)
+  language?: Language;
 
   /**
    * User occupation or job title.
