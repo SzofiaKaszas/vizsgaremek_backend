@@ -320,6 +320,10 @@ export class UserService {
         updateUserDto,
         'user',
       );
+      if(updateUserDto.birthDay){
+        updateUserDto.birthDay = new Date(updateUserDto.birthDay).toString()
+      }
+      
 
       return await this.db.user.update({
         where: { idUser: id },

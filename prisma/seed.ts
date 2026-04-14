@@ -103,7 +103,7 @@ async function main() {
         lastName: "test02",
         phoneNumber: "00000000002",
         password: await argon2.hash("test02"),
-        email: "t02@t02.t02",
+        email: "t02@gmail.com",
         hasHouse: false,
         lookingForPeople: true,
         lookingForHouse: false,
