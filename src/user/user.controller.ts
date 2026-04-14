@@ -56,7 +56,7 @@ export class UserController {
     description: 'Database opperation failed'
   })
   create(@Body() createUserDto: CreateUserDto) {
-    
+    //console.log("reg called")
     return this.userService.create(createUserDto);
   }
 

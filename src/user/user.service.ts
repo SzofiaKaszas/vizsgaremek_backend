@@ -43,12 +43,23 @@ export class UserService {
    * @returns Created user data with out password
    */
   async create(createUserDto: CreateUserDto) {
+    //console.log("reg service called")
     try {
       const newUser = {
         ...createUserDto,
         role: 'user',
         password: await argon2.hash(createUserDto.password), //securely hash the password before storing
       };
+      //console.log(newUser)
+      //console.log("reg before return")
+      /*if(!newUser.gender || !Object.values(UserGender).includes(newUser.gender)){
+        console.log("Bad gender input")
+      }
+      if(!newUser.language || !Object.values(Language).includes(newUser.language)){
+        console.log("Bad language input")
+      }*/
+      if(!newUser.birthDay){throw new BadRequestException("Birthday is mandatory")}
+      const bd = new Date(newUser.birthDay)
       return await this.db.user.create({
         data: {
           email: newUser.email,
@@ -59,7 +70,7 @@ export class UserService {
           lookingForHouse: newUser.lookingForHouse,
           lookingForPeople: newUser.lookingForPeople,
           phoneNumber: newUser.phoneNumber,
-          birthDay: newUser.birthDay,
+          birthDay: bd,
           connectionEmail: newUser.connectionEmail,
           gender: newUser.gender as UserGender,
           language: newUser.language as Language,
@@ -72,6 +83,7 @@ export class UserService {
         },
       });
     } catch (error) {
+      //console.log(error)
       handlePrismaError(error);
     }
   }
