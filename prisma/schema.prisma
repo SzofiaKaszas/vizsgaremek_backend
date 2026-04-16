@@ -90,7 +90,7 @@ model User {
   language        Language?
   occupation      String?
   connectionEmail String? //contactemail (the right word)
-  rating          Float? 
+  rating          Float? @default(0)
 
   hasHouse         Boolean @default(false)
   lookingForPeople Boolean @default(false)
@@ -199,6 +199,8 @@ model HouseListing {
   kitchenLevel    KitchenLevel //enum
   bathrooms       Int
   airConditioner  Boolean
+
+  rating Float? @default(0)
 
   user User? @relation(fields: [houseIdUser], references: [idUser]) //relation to User model but not everyone has a listing
 
