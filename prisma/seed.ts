@@ -103,6 +103,7 @@ async function main() {
         propertyType: "flat"
       }
     })
+    
     const testUser2 = await tx.user.create({
       data:{
         firstName: "test02",
@@ -153,6 +154,23 @@ async function main() {
       }
     })
 
+    const testUser1RatingRoomate = await tx.roommateRatings.create({
+      data:{
+        raterId: testUser1.idUser,
+        ratedUserId: testUser2.idUser,
+        ratingMessage: "Good roommate",
+        ratingScore: 5,
+      }
+    })
+
+    const testUser1RatingHouse = await tx.houseListingRatings.create({
+      data:{
+        raterId: testUser1.idUser,
+        ratedHouseId: testUser2HouseListing.idHouse,
+        ratingMessage: "Good house",
+        ratingScore: 5,
+      }
+    })
 
     //User
     for (let i = 0; i < generateUserCount ; i++){
