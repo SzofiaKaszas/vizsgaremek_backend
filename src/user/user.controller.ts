@@ -85,9 +85,15 @@ export class UserController {
   /**
    * Get the user from token
    */
+  /**
+   * Gets the current authenticated user
+   * @param request Request object containing user authentication
+   * @returns Current user data
+   * @throws {UnauthorizedException} User not authenticated
+   */
   @Get('me')
   @ApiOkResponse({
-    description: 'Returns the user',
+    description: 'Returns the current user',
     type: UserBaseDto
   })
   @ApiForbiddenResponse({
@@ -129,7 +135,23 @@ export class UserController {
     return this.userService.getNecessary(id);
   }
   
+  /**
+   * Gets the liked users for the current user
+   * @param request Request object containing user authentication
+   * @returns List of liked users
+   * @throws {UnauthorizedException} User not authenticated
+   * @throws {InternalServerErrorException} Database operation failed
+   */
   @Get('liked')
+  @ApiOkResponse({
+    description: 'Successfully retrieved list of liked users'
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User not authenticated'
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Database operation failed'
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   getLikes(
@@ -186,14 +208,31 @@ export class UserController {
 
 
   /**
-   * Likes user or removes like if already liked
+   * Likes or unlikes a user
+   * @param id ID of the user to like/unlike
+   * @param request Request object containing user authentication
+   * @param res Response object
+   * @returns Like creation or deletion result
+   * @throws {UnauthorizedException} User not authenticated
+   * @throws {InternalServerErrorException} Database operation failed
    */
   @Post('like/:id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the user to like or unlike',
+    type: Number
+  })
   @ApiCreatedResponse({
-    description: 'Like succefuly created',
+    description: 'Like successfully created'
   })
   @ApiOkResponse({
     description: 'Like deleted'
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User not authenticated'
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Database operation failed'
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
@@ -213,7 +252,37 @@ export class UserController {
     }
   }
 
+  /**
+   * Rates a user
+   * @param id ID of the user to rate
+   * @param createRatingDto Rating data
+   * @param request Request object containing user authentication
+   * @returns Created rating
+   * @throws {ForbiddenException} User cannot rate themselves
+   * @throws {UnauthorizedException} User not authenticated
+   * @throws {InternalServerErrorException} Database operation failed
+   */
   @Post('rate/:id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the user to rate',
+    type: Number
+  })
+  @ApiBody({
+    type: CreateRatingDto
+  })
+  @ApiCreatedResponse({
+    description: 'Successfully created the rating'
+  })
+  @ApiForbiddenResponse({
+    description: 'User cannot rate themselves'
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User not authenticated'
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Database operation failed'
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   rate(
@@ -227,7 +296,37 @@ export class UserController {
     return this.userService.rateUser(user.idUser,id,createRatingDto)
   }
 
+  /**
+   * Updates a user rating
+   * @param id ID of the user whose rating to update
+   * @param updateRatingDto Updated rating data
+   * @param request Request object containing user authentication
+   * @returns Updated rating
+   * @throws {ForbiddenException} User cannot rate themselves
+   * @throws {UnauthorizedException} User not authenticated
+   * @throws {InternalServerErrorException} Database operation failed
+   */
   @Patch('rate/:id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the user whose rating to update',
+    type: Number
+  })
+  @ApiBody({
+    type: UpdateRatingDto
+  })
+  @ApiOkResponse({
+    description: 'Successfully updated the rating'
+  })
+  @ApiForbiddenResponse({
+    description: 'User cannot rate themselves'
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User not authenticated'
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Database operation failed'
+  })
    @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   updateRating(
