@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-http-bearer';
 import { PrismaService } from 'src/prisma.service';
@@ -27,14 +27,14 @@ export class TokenStrategy extends PassportStrategy(Strategy) {
    * 
    * @param token the token string extracted from the Authorization header
    * @returns the user that the token is linked to (omits the password)
-   * @throws {UnauthorizedException} if it doesnt find a token like in the params
+   * @throws {ForbiddenException} if it doesnt find a token like in the params
    */
   async validate(token: string) {
     const tokenObj = await this.db.userToken.findUnique({
       where: { token: token },
     });
     if (!tokenObj) {
-      throw new UnauthorizedException('Invalid token');
+      throw new ForbiddenException('Invalid token');
     }
     const user = await this.db.user.findUniqueOrThrow({
       where: { idUser: tokenObj.userIdToken },
