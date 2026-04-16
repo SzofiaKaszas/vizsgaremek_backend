@@ -43,6 +43,12 @@ async function main() {
 
       }
     })
+    const xAdminToken = await tx.userToken.create({
+      data:{
+        user: {connect: {idUser: xAdmin.idUser} },
+        token: "admintoken",
+      }
+    })
 
     //Test Users for testing the matching algorithm, they have fixed preferences and attributes to ensure matches
     const testUser1 = await tx.user.create({

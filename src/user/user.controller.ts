@@ -280,6 +280,9 @@ export class UserController {
   @ApiUnauthorizedResponse({
     description: 'User not authenticated'
   })
+  @ApiNotFoundResponse({
+    description: 'No user found with id'
+  })
   @ApiInternalServerErrorResponse({
     description: 'Database operation failed'
   })
@@ -323,6 +326,9 @@ export class UserController {
   })
   @ApiUnauthorizedResponse({
     description: 'User not authenticated'
+  })
+  @ApiConflictResponse({
+    description: 'This rating already exists, use PATCH to update it'
   })
   @ApiInternalServerErrorResponse({
     description: 'Database operation failed'
