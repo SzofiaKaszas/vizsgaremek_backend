@@ -181,10 +181,15 @@ model RoommatesPrefrences {
   user User? @relation(fields: [roommatesPrefrencesIdUser], references: [idUser]) //relation to User model but not everyone is looking for roommates
 }
 
-//TODO: add content Hunor
+//TODO: add content
 model UserImages{
-  id Int @id @default(autoincrement())
+  id           Int @id @default(autoincrement())
   userIdImages Int
+  key          String
+  IsProfile    Boolean @default(false)
+  deleted      Boolean @default(false)
+  url          String
+  createdAt    DateTime @default(now())
 
   //Content
 
