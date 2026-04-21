@@ -11,12 +11,13 @@ import { RoommatesPrefrencesModule } from './roommates-prefrences/roommates-pref
 import { HouseListingModule } from './house-listing/house-listing.module';
 import { HouseSearchPrefrencesModule } from './house-search-prefrences/house-search-prefrences.module';
 import { AdminModule } from './admin/admin.module';
+import { ImagesModule } from './images/images.module';
 
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
-  }), UserModule, UserTokenModule, RoommatesPrefrencesModule, HouseListingModule, HouseSearchPrefrencesModule, AdminModule],
+  }), UserModule, UserTokenModule, RoommatesPrefrencesModule, HouseListingModule, HouseSearchPrefrencesModule, AdminModule, ImagesModule],
   controllers: [AppController],
   providers: [AppService, PrismaService], // Added PrismaService here
 })

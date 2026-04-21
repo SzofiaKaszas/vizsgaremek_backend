@@ -109,6 +109,7 @@ model User {
   ratedBy             RoommateRatings[]      @relation("UserRoommateRatedBy")
   likedHouses         LikedHouse[]           @relation("UserHouseListingLikes")
   ratedHouses         HouseListingRatings[]    @relation("UserHouseListingRatings")
+  images UserImages[]
 
 }
 
@@ -180,6 +181,16 @@ model RoommatesPrefrences {
   user User? @relation(fields: [roommatesPrefrencesIdUser], references: [idUser]) //relation to User model but not everyone is looking for roommates
 }
 
+//TODO: add content Hunor
+model UserImages{
+  id Int @id @default(autoincrement())
+  userIdImages Int
+
+  //Content
+
+  user User @relation(fields: [userIdImages], references: [idUser])
+}
+
 //HouseListing Model to store house listings posted by users (done)
 //***HouseListing tables API is src/house-listing***
 model HouseListing {
@@ -207,6 +218,7 @@ model HouseListing {
   //images HouseImage[]
   likedBy LikedHouse[] @relation("HouseListingLikedBy")
   ratedBy HouseListingRatings[] @relation("HouseListingRatedBy")
+  images HouseImages[]
 }
 
 /**
@@ -269,4 +281,13 @@ model HouseListingRatings {
   rated HouseListing @relation("HouseListingRatedBy",fields: [ratedHouseId], references: [idHouse], onDelete: Cascade)
 
   @@unique([raterId,ratedHouseId])
+}
+//TODO: add content Hunor
+model HouseImages{
+  id Int @id @default(autoincrement())
+  userIdImages Int
+  
+  //Content
+
+  house HouseListing @relation(fields: [userIdImages], references: [idHouse])
 }
