@@ -36,11 +36,11 @@ async function main() {
         phoneNumber: "00000000000",
         password: await argon2.hash("admin"),
         email: "admin@admin.admin",
-        hasHouse: false,
-        lookingForPeople: false,
-        lookingForHouse: false,
-        role: "admin"
-
+        hasHouse: true,
+        lookingForPeople: true,
+        lookingForHouse: true,
+        role: "admin",
+        birthDay: faker.date.birthdate({min: 18, max: 80, mode: 'age'}),
       }
     })
     const xAdminToken = await tx.userToken.create({

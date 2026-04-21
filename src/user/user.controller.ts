@@ -9,7 +9,6 @@ import {
   Delete,
   UseGuards,
   Request,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ForbiddenException,
   ParseIntPipe,
   UnauthorizedException,
