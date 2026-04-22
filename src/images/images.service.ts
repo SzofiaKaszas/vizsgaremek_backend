@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -85,7 +86,7 @@ export class ImagesService {
       const key = `${Date.now()}-${safeName}`;
       const url = `http://localhost:9000/${this.bucket}/${key}`;
 
-
+      console.log("s3 called")
       const resp = await s3.send(
         new PutObjectCommand({
           Bucket: this.bucket,
@@ -94,6 +95,7 @@ export class ImagesService {
           ContentType: file.mimetype,
         }),
       );
+      console.log("s3 done")
       
       if(resp){console.log(resp)}
 
@@ -109,6 +111,7 @@ export class ImagesService {
       return image;
     } catch (error) {
       handlePrismaError(error);
+      throw new InternalServerErrorException("s3 has issues D:")
     }
   }
 

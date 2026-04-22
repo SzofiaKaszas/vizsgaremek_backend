@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UnauthorizedException, ParseIntPipe, BadRequestException, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UnauthorizedException, ParseIntPipe, BadRequestException, Res, InternalServerErrorException } from '@nestjs/common';
 import { HouseListingService } from './house-listing.service';
 import { CreateHouseListingDto } from './dto/create-house-listing.dto';
 import { UpdateHouseListingDto } from './dto/update-house-listing.dto';
@@ -181,6 +181,7 @@ export class HouseListingController {
   ){
     const user = request.user as User
     const result = await this.houseListingService.likeHouse(user.idUser,id)
+    if(!result){throw new InternalServerErrorException}
     const data = result.data 
     if(result.action == 'created'){
       return res.status(201).send({data})

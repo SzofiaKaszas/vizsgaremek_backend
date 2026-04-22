@@ -7,6 +7,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { User } from 'generated/prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { isAuthorized } from 'src/helperFunctions/helpers';
+import {type Express } from 'express';
 
 @Controller('images')
 export class ImagesController {
@@ -20,6 +21,7 @@ export class ImagesController {
     @UploadedFile() file: Express.Multer.File,
     @Request() request
   ) {
+    console.log("upload endpoint called")
     const user = request.user as User
     if(!file){
       throw new BadRequestException("No file uploaded")

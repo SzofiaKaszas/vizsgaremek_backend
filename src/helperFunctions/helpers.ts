@@ -33,7 +33,7 @@ function isAuthorized(user: User, resourceOwnerId: number): boolean {
  * @throws {BadRequestException}
  * @throws {InternalServerErrorException}
  */
-function handlePrismaError(error: unknown): never {
+function handlePrismaError(error: unknown) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         switch (error.code) {
           case 'P2002':
@@ -46,8 +46,7 @@ function handlePrismaError(error: unknown): never {
           default:
             throw new InternalServerErrorException('Database operation failed');
         }
-      }
-      throw new InternalServerErrorException('An unexpected error occurred');
+      };
     }
 /**
  * Calculates what percentage a value represents between preferred and maximum deviation

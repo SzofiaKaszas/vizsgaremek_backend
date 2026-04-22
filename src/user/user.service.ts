@@ -221,7 +221,7 @@ export class UserService {
             }
           },
           role: "user"
-        },
+        }, 
         omit:{
           password: true
         }
