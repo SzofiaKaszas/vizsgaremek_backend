@@ -29,6 +29,7 @@ import { Language,UserGender } from "generated/prisma/enums";
 @Injectable()
 export class UserService {
   
+  
   constructor(private readonly db: PrismaService) {}
 
   //create a new user with hashed password
@@ -240,6 +241,46 @@ export class UserService {
       return { action: 'created', data: createdLike };
     } catch (error) {
       handlePrismaError(error);
+    }
+  }
+
+  async getLikesMatches(idUser: number) {
+    try {
+      const mutual = await this.db.likedRoommate.findMany({
+        where:{
+          likerId: idUser,
+          liked:{
+            likedRoommates:{
+              some:{
+                likedUserId: idUser
+              }
+            }
+          }
+        },
+        include:{
+          liked: true
+        }
+      })
+      const mutualUsers = mutual.map((mut) => mut.liked)
+      return mutualUsers
+    } catch (error) {
+      handlePrismaError(error)
+    }
+  }
+  async getLikesRecieved(idUser: number) {
+    try {
+      const likedBy = await this.db.likedRoommate.findMany({
+        where:{
+          likedUserId: idUser
+        },
+        include:{
+          liker: true
+        }
+      })
+      const usersWhoLikedMe = likedBy.map((like) => like.liker)
+      return usersWhoLikedMe
+    } catch (error) {
+      handlePrismaError(error)
     }
   }
 
