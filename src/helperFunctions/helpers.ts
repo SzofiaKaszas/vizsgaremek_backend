@@ -40,7 +40,7 @@ function handlePrismaError(error: unknown): never {
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             throw new ConflictException(`User with this ${error.meta?.target} already exists`);
           case 'P2025':
-            throw new NotFoundException('User not found');
+            throw new NotFoundException('Data not found');
           case 'P2003':
             throw new BadRequestException('Invalid reference provided');
           default:

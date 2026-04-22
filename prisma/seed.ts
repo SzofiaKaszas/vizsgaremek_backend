@@ -36,11 +36,17 @@ async function main() {
         phoneNumber: "00000000000",
         password: await argon2.hash("admin"),
         email: "admin@admin.admin",
-        hasHouse: false,
-        lookingForPeople: false,
-        lookingForHouse: false,
-        role: "admin"
-
+        hasHouse: true,
+        lookingForPeople: true,
+        lookingForHouse: true,
+        role: "admin",
+        birthDay: faker.date.birthdate({min: 18, max: 80, mode: 'age'}),
+      }
+    })
+    const xAdminToken = await tx.userToken.create({
+      data:{
+        user: {connect: {idUser: xAdmin.idUser} },
+        token: "admintoken",
       }
     })
 
@@ -97,6 +103,7 @@ async function main() {
         propertyType: "flat"
       }
     })
+    
     const testUser2 = await tx.user.create({
       data:{
         firstName: "test02",
@@ -147,6 +154,23 @@ async function main() {
       }
     })
 
+    const testUser1RatingRoomate = await tx.roommateRatings.create({
+      data:{
+        raterId: testUser1.idUser,
+        ratedUserId: testUser2.idUser,
+        ratingMessage: "Good roommate",
+        ratingScore: 5,
+      }
+    })
+
+    const testUser1RatingHouse = await tx.houseListingRatings.create({
+      data:{
+        raterId: testUser1.idUser,
+        ratedHouseId: testUser2HouseListing.idHouse,
+        ratingMessage: "Good house",
+        ratingScore: 5,
+      }
+    })
 
     //User
     for (let i = 0; i < generateUserCount ; i++){
