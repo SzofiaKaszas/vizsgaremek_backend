@@ -104,7 +104,8 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   getCurrentUser(@Request() request) {
-    return request.user as User;
+    const user = request.user as User
+    return this.userService.me(user);
   }
 
   /**

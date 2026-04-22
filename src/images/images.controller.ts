@@ -1,47 +1,69 @@
-import { BadRequestException,UseInterceptors, UploadedFile,Controller, Get, Post, Body, Patch, Param,ParseIntPipe, Delete } from '@nestjs/common';
+import { BadRequestException,UseInterceptors, UploadedFile,Controller, Get, Post, Body, Patch, Param,ParseIntPipe, Delete, Request, UseGuards } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { User } from 'generated/prisma/client';
+import { AuthGuard } from '@nestjs/passport';
+import { isAuthorized } from 'src/helperFunctions/helpers';
 
 @Controller('images')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
   @Post("upload")
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
   @UseInterceptors(FileInterceptor("file", { limits: { fileSize: 2 * 1024 * 1024 } }))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const userIdImages=1
+  uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() request
+  ) {
+    const user = request.user as User
     if(!file){
       throw new BadRequestException("No file uploaded")
     }
     if(!file.mimetype.startsWith("image/")){
       throw new BadRequestException("Only pictures are allowed")
     }
-    return this.imagesService.upload(file,userIdImages);
+    return this.imagesService.upload(file,user.idUser);
+  }
+  
+  @Get("image-count/:id")
+  getImageCount(
+    @Param("id", ParseIntPipe) id:number
+  ){
+    return this.imagesService.getImageCount(id)
   }
 
-  @Get("images")
-  getImages(){
-    const userIdImages=1
-    return this.imagesService.getImages(userIdImages)
+  @Get("images/:id")
+  getImages(
+    @Param("id", ParseIntPipe) id:number
+  ){
+    return this.imagesService.getImages(id)
   }
 
-  @Get("image-count")
-  getImageCount(){
-    const userIdImages=1
-    return this.imagesService.getImageCount(userIdImages)
+
+  @Post("profile/:imageId")
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  setProfile(
+    @Param("imageId",ParseIntPipe) imageId:number,
+    @Request() request  
+  ){
+    const user = request.user as User
+    return this.imagesService.setProfile(user.idUser,imageId)
   }
 
-  @Post("profile/:id")
-  setProfile(@Param("id",ParseIntPipe) id:number){
-    const userIdImages=1
-    return this.imagesService.setProfile(userIdImages,id)
-  }
-
-  @Delete(":id")
-  deletImag(@Param("id",ParseIntPipe) id:number){
-    const userIdImages=1
-    return this.imagesService.deletImag(id,userIdImages)
+  @Delete(":imageId")
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  deletImag(
+    @Param("imageId",ParseIntPipe) imageId:number,
+    @Request() request
+  ){
+    const user = request.user as User
+    return this.imagesService.deletImag(imageId,user)
   }
 }
