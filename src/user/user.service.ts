@@ -250,6 +250,7 @@ export class UserService {
         where:{
           likerId: idUser,
           liked:{
+            role: "user",
             likedRoommates:{
               some:{
                 likedUserId: idUser
@@ -258,7 +259,11 @@ export class UserService {
           }
         },
         include:{
-          liked: true
+          liked:{
+            omit:{
+              password: true
+            }
+          }
         }
       })
       const mutualUsers = mutual.map((mut) => mut.liked)
@@ -271,10 +276,17 @@ export class UserService {
     try {
       const likedBy = await this.db.likedRoommate.findMany({
         where:{
-          likedUserId: idUser
+          likedUserId: idUser,
+          liker: {
+            role: "user"
+          }
         },
         include:{
-          liker: true
+          liker:{
+            omit:{
+              password:true
+            },
+          }
         }
       })
       const usersWhoLikedMe = likedBy.map((like) => like.liker)
