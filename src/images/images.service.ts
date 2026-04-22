@@ -10,7 +10,7 @@ import { PrismaService } from 'src/prisma.service';
 import { s3 } from 'src/s3/s3.service';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { Express } from 'express';
-import { Multer } from 'multer';
+//import { Multer } from 'multer';
 import { User } from 'generated/prisma/client';
 import { handlePrismaError, isAuthorized } from 'src/helperFunctions/helpers';
 

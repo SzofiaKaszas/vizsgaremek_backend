@@ -33,11 +33,25 @@ export class UserService {
  
   
   
-  constructor(private readonly db: PrismaService, private readonly imageService : ImagesService) {}
+  constructor(private readonly db: PrismaService, /*private readonly imageService : ImagesService*/) {}
+
+  async imageFind(userId){
+    try {
+      const images = await this.db.userImages.findMany({
+        where: {
+          userIdImages: userId,
+          deleted: false,
+        },
+      });
+      return images;
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
 
   async me(user: User) {
     
-    const images = await this.imageService.getImages(user.idUser)
+    const images = await this.imageFind(user.idUser)
     return {...user,images}
   }
 
@@ -172,7 +186,7 @@ export class UserService {
         where: { idUser: id,role: "user" },
         omit: { password: true },
       });
-      const images = await this.imageService.getImages(id)
+      const images = await this.imageFind(id)
       return {...user,images}
     } catch (error) {
       handlePrismaError(error);
