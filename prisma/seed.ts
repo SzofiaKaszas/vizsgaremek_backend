@@ -3,363 +3,469 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { PrismaClient} from "../generated/prisma/client"
-import { faker } from '@faker-js/faker'
-import dotenv from 'dotenv'
+import { PrismaClient } from '../generated/prisma/client';
+import { faker } from '@faker-js/faker';
+import dotenv from 'dotenv';
 import * as argon2 from 'argon2';
 
-import { FurnishingLevel,HeatingType,KitchenLevel,PropertyType,Language,UserGender,UserPrefGender } from "../generated/prisma/enums"
+import {
+  FurnishingLevel,
+  HeatingType,
+  KitchenLevel,
+  PropertyType,
+  Language,
+  UserGender,
+  UserPrefGender,
+} from '../generated/prisma/enums';
 
-dotenv.config()
-const prisma = new PrismaClient()
+dotenv.config();
+const prisma = new PrismaClient();
 
 //TODO: added new tables seeding
 async function main() {
+  const generateUserCount = 10;
+  const generateHouseListingCount = 20;
 
-  const generateUserCount = 10
-  const generateHouseListingCount = 20
-  
+  await prisma.$transaction(async (tx) => {
+    const userIds: number[] = [];
+    const houseListingIds: number[] = [];
+    const houseCitys: string[] = [];
 
-
-
-  await prisma.$transaction(async tx =>{
-    
-    const userIds: number [] = []
-    const houseListingIds: number [] = []
-    const houseCitys: string [] = []
+    const userPictureLinks: string[] = [
+      'http://localhost:9000/test-image/Profil/f1.jpg',
+      'http://localhost:9000/test-image/Profil/f2.jpg',
+      'http://localhost:9000/test-image/Profil/f3.jpg',
+      'http://localhost:9000/test-image/Profil/f4.jpg',
+      'http://localhost:9000/test-image/Profil/f5.jpg',
+      'http://localhost:9000/test-image/Profil/L1.jpg',
+      'http://localhost:9000/test-image/Profil/L2.jpg',
+      'http://localhost:9000/test-image/Profil/L3.jpg',
+      'http://localhost:9000/test-image/Profil/L4.jpg',
+      'http://localhost:9000/test-image/Profil/L5.jpg',
+    ];
+    const housePictureLinks: string[] = [
+      'http://localhost:9000/test-image/House/H1.jpg',
+      'http://localhost:9000/test-image/House/H2.jpg',
+      'http://localhost:9000/test-image/House/H3.jpg',
+      'http://localhost:9000/test-image/House/H4.jpg',
+      'http://localhost:9000/test-image/House/H5.jpg',
+      'http://localhost:9000/test-image/House/H6.jpg',
+      'http://localhost:9000/test-image/House/H7.jpg',
+      'http://localhost:9000/test-image/House/H8.jpg',
+    ];
 
     //Admin
     const xAdmin = await tx.user.create({
-      data:{
-        firstName: "admin",
-        lastName: "admin",
-        phoneNumber: "00000000000",
-        password: await argon2.hash("admin"),
-        email: "admin@admin.admin",
+      data: {
+        firstName: 'admin',
+        lastName: 'admin',
+        phoneNumber: '00000000000',
+        password: await argon2.hash('admin'),
+        email: 'admin@admin.admin',
         hasHouse: true,
         lookingForPeople: true,
         lookingForHouse: true,
-        role: "admin",
-        birthDay: faker.date.birthdate({min: 18, max: 80, mode: 'age'}),
-      }
-    })
+        role: 'admin',
+        birthDay: faker.date.birthdate({ min: 18, max: 80, mode: 'age' }),
+      },
+    });
     const xAdminToken = await tx.userToken.create({
-      data:{
-        user: {connect: {idUser: xAdmin.idUser} },
-        token: "admintoken",
-      }
-    })
+      data: {
+        user: { connect: { idUser: xAdmin.idUser } },
+        token: 'admintoken',
+      },
+    });
 
     //Test Users for testing the matching algorithm, they have fixed preferences and attributes to ensure matches
     const testUser1 = await tx.user.create({
-      data:{
-        firstName: "test01",
-        lastName: "test01",
-        phoneNumber: "00000000001",
-        password: await argon2.hash("test01"),
-        email: "t01@t01.t01",
+      data: {
+        firstName: 'test01',
+        lastName: 'test01',
+        phoneNumber: '00000000001',
+        password: await argon2.hash('test01'),
+        email: 't01@t01.t01',
         hasHouse: false,
         lookingForPeople: true,
         lookingForHouse: false,
-        role: "user",
-        userBio: "I am test user 1, looking for roommates.",
+        role: 'user',
+        userBio: 'I am test user 1, looking for roommates.',
         birthDay: faker.date.birthdate(),
-        gender: "male",
-        language: "English"
-      }
+        gender: 'male',
+        language: 'English',
+      },
     });
     const testUser1Token = await tx.userToken.create({
-      data:{
-        user: {connect: {idUser: testUser1.idUser} },
-        token: "test01token",
-      }
-    })
+      data: {
+        user: { connect: { idUser: testUser1.idUser } },
+        token: 'test01token',
+      },
+    });
     const testUser1Token2 = await tx.userToken.create({
-      data:{
-        user: {connect: {idUser: testUser1.idUser} },
-        token: "t1",
-      }
-    })
+      data: {
+        user: { connect: { idUser: testUser1.idUser } },
+        token: 't1',
+      },
+    });
     const testUser1Preferences = await tx.roommatesPrefrences.create({
-      data:{
-        user: {connect: {idUser: testUser1.idUser} },
+      data: {
+        user: { connect: { idUser: testUser1.idUser } },
         minAge: 20,
         maxAge: 30,
-        gender: "male",
-        language: "English"
-      }
-    })
+        gender: 'male',
+        language: 'English',
+      },
+    });
     const testUser1HousePreferences = await tx.houseSearchPrefrences.create({
-      data:{
-        user: {connect:{idUser: testUser1.idUser}},
-        city: "Budapest",
-        furnishingLevel: "full",
-        heatingType: "radiator",
-        kitchenLevel: "full",
+      data: {
+        user: { connect: { idUser: testUser1.idUser } },
+        city: 'Budapest',
+        furnishingLevel: 'full',
+        heatingType: 'radiator',
+        kitchenLevel: 'full',
         maxRent: 100000,
         minBathrooms: 1,
         minRooms: 3,
         minSquareMeters: 100,
-        propertyType: "flat"
-      }
-    })
-    
+        propertyType: 'flat',
+      },
+    });
+
     const testUser2 = await tx.user.create({
-      data:{
-        firstName: "test02",
-        lastName: "test02",
-        phoneNumber: "00000000002",
-        password: await argon2.hash("test02"),
-        email: "t02@gmail.com",
+      data: {
+        firstName: 'test02',
+        lastName: 'test02',
+        phoneNumber: '00000000002',
+        password: await argon2.hash('test02'),
+        email: 't02@gmail.com',
         hasHouse: false,
         lookingForPeople: true,
         lookingForHouse: false,
-        role: "user",
-        userBio: "I am test user 2, looking for roommates.",
+        role: 'user',
+        userBio: 'I am test user 2, looking for roommates.',
         birthDay: faker.date.birthdate(),
-        gender: "male",
-        language: "English"
-      }
+        gender: 'male',
+        language: 'English',
+      },
     });
     const testUser2Token = await tx.userToken.create({
-      data:{
-        user: {connect: {idUser: testUser2.idUser} },
-        token: "test02token",
-      }
-    })
+      data: {
+        user: { connect: { idUser: testUser2.idUser } },
+        token: 'test02token',
+      },
+    });
     const testUser2Preferences = await tx.roommatesPrefrences.create({
-      data:{
-        user: {connect: {idUser: testUser2.idUser} },
+      data: {
+        user: { connect: { idUser: testUser2.idUser } },
         minAge: 20,
         maxAge: 30,
-        gender: "male",
-        language: "English"
-      }
-    })
+        gender: 'male',
+        language: 'English',
+      },
+    });
     const testUser2HouseListing = await tx.houseListing.create({
-      data:{
-        user: {connect: {idUser: testUser2.idUser}},
+      data: {
+        user: { connect: { idUser: testUser2.idUser } },
         airConditioner: false,
-        city: "Budapest",
-        furnishingLevel: "full",
-        heatingType: "radiator",
-        kitchenLevel: "full",
+        city: 'Budapest',
+        furnishingLevel: 'full',
+        heatingType: 'radiator',
+        kitchenLevel: 'full',
         rent: 90000,
         bathrooms: 2,
         numberOfRooms: 5,
         squareMeter: 120,
-        propertyType: "flat",
-        description: "",
-        location:"",
-      }
-    })
+        propertyType: 'flat',
+        description: '',
+        location: '',
+      },
+    });
 
     const testUser1RatingRoomate = await tx.roommateRatings.create({
-      data:{
+      data: {
         raterId: testUser1.idUser,
         ratedUserId: testUser2.idUser,
-        ratingMessage: "Good roommate",
+        ratingMessage: 'Good roommate',
         ratingScore: 5,
-      }
-    })
+      },
+    });
 
     const testUser1RatingHouse = await tx.houseListingRatings.create({
-      data:{
+      data: {
         raterId: testUser1.idUser,
         ratedHouseId: testUser2HouseListing.idHouse,
-        ratingMessage: "Good house",
+        ratingMessage: 'Good house',
         ratingScore: 5,
-      }
-    })
+      },
+    });
 
     //User
-    for (let i = 0; i < generateUserCount ; i++){
+    for (let i = 0; i < generateUserCount; i++) {
       const xUser = await tx.user.create({
-        data:{
+        data: {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
-          
+
           phoneNumber: faker.phone.number(),
-          
+
           password: await argon2.hash(faker.internet.password()),
-          email:faker.internet.email(),
-          
+          email: faker.internet.email(),
+
           hasHouse: faker.datatype.boolean(),
           lookingForPeople: faker.datatype.boolean(),
           lookingForHouse: faker.datatype.boolean(),
 
-          role: "user",
+          role: 'user',
 
           //optional
           userBio: faker.person.bio(),
           birthDay: faker.date.birthdate(),
-          gender: faker.helpers.arrayElement(Object.values(UserGender).filter(v => typeof v === 'string')),
-          language: faker.helpers.arrayElement(Object.values(Language).filter(v => typeof v === 'string')),
+          gender: faker.helpers.arrayElement(
+            Object.values(UserGender).filter((v) => typeof v === 'string'),
+          ),
+          language: faker.helpers.arrayElement(
+            Object.values(Language).filter((v) => typeof v === 'string'),
+          ),
           occupation: faker.person.jobTitle(),
-          connectionEmail:faker.internet.email()
-
-        }
-      })
-      userIds.push(xUser.idUser)
+          connectionEmail: faker.internet.email(),
+        },
+      });
+      userIds.push(xUser.idUser);
     }
-    
+
     //UserToken
-    for (let i = 0; i <userIds.length ; i++){
+    for (let i = 0; i < userIds.length; i++) {
       const xToken = await tx.userToken.create({
-        data:{
-          user: {connect: {idUser: faker.helpers.arrayElement(userIds)} },
+        data: {
+          user: { connect: { idUser: faker.helpers.arrayElement(userIds) } },
           token: faker.string.uuid(),
-        }
-      })
+        },
+      });
     }
 
     //LikedRoommate
     const likedRoommateSet = new Set<string>();
-    for (let i = 0 ;i<userIds.length; i++){
-      const likerId= faker.helpers.arrayElement(userIds)
-      const likedId= faker.helpers.arrayElement(userIds.filter(id=>id!==likerId)) //cannot like oneself
+    for (let i = 0; i < userIds.length; i++) {
+      const likerId = faker.helpers.arrayElement(userIds);
+      const likedId = faker.helpers.arrayElement(
+        userIds.filter((id) => id !== likerId),
+      ); //cannot like oneself
 
       const pairKey = `${likerId}-${likedId}`;
-      if (likedRoommateSet.has(pairKey)) {continue;} //skip if already exists
+      if (likedRoommateSet.has(pairKey)) {
+        continue;
+      } //skip if already exists
       likedRoommateSet.add(pairKey);
-      const xLikedRoommate=await tx.likedRoommate.create({
-        data:{
-          liker: {connect: {idUser: likerId} },
-          liked: {connect: {idUser: likedId} },
-        }
-      })
+      const xLikedRoommate = await tx.likedRoommate.create({
+        data: {
+          liker: { connect: { idUser: likerId } },
+          liked: { connect: { idUser: likedId } },
+        },
+      });
     }
-
 
     //RoommatesPrefrences
-   for (let i = 0 ;i<userIds.length; i++){
-      const xRoommatesPrefrences=await tx.roommatesPrefrences.create({
-        data:{
-          user: {connect: {idUser: userIds[i]} },
-          minAge:faker.number.int({min:16, max:25 }),
-          maxAge:faker.number.int({min:25, max:99 }),
-          gender: faker.helpers.arrayElement(Object.values(UserGender).filter(v => typeof v === 'string')),
-          language: faker.helpers.arrayElement(Object.values(Language).filter(v => typeof v === 'string')),
-
-        }
-      })
+    for (let i = 0; i < userIds.length; i++) {
+      const xRoommatesPrefrences = await tx.roommatesPrefrences.create({
+        data: {
+          user: { connect: { idUser: userIds[i] } },
+          minAge: faker.number.int({ min: 16, max: 25 }),
+          maxAge: faker.number.int({ min: 25, max: 99 }),
+          gender: faker.helpers.arrayElement(
+            Object.values(UserGender).filter((v) => typeof v === 'string'),
+          ),
+          language: faker.helpers.arrayElement(
+            Object.values(Language).filter((v) => typeof v === 'string'),
+          ),
+        },
+      });
     }
     //HouseListing
-    for(let i= 0;i<generateHouseListingCount;i++){
-      const xHouseListing=await tx.houseListing.create({
-        data:{
-          
-          user: {connect: {idUser: faker.helpers.arrayElement(userIds)} },
+    for (let i = 0; i < generateHouseListingCount; i++) {
+      const xHouseListing = await tx.houseListing.create({
+        data: {
+          user: { connect: { idUser: faker.helpers.arrayElement(userIds) } },
 
           description: faker.person.bio(), //Not the best fake data, but couldnt find better
           location: faker.location.streetAddress(true),
-          city:faker.location.city(),
-          rent:faker.number.int({min:10000, max:500000}),
+          city: faker.location.city(),
+          rent: faker.number.int({ min: 10000, max: 500000 }),
 
-          propertyType: faker.helpers.arrayElement(Object.values(PropertyType).filter(v => typeof v === 'string')),
-          whichFloor:faker.number.int({min:0, max:30}),
-          numberOfRooms:faker.number.int({min:1, max:30}),
-          squareMeter:faker.number.float({ min: 10, max: 100, fractionDigits: 2 }),
+          propertyType: faker.helpers.arrayElement(
+            Object.values(PropertyType).filter((v) => typeof v === 'string'),
+          ),
+          whichFloor: faker.number.int({ min: 0, max: 30 }),
+          numberOfRooms: faker.number.int({ min: 1, max: 30 }),
+          squareMeter: faker.number.float({
+            min: 10,
+            max: 100,
+            fractionDigits: 2,
+          }),
 
-          heatingType: faker.helpers.arrayElement(Object.values(HeatingType).filter(v => typeof v === 'string')),
-          furnishingLevel: faker.helpers.arrayElement(Object.values(FurnishingLevel).filter(v => typeof v === 'string')),
-          kitchenLevel: faker.helpers.arrayElement(Object.values(KitchenLevel).filter(v => typeof v === 'string')),
+          heatingType: faker.helpers.arrayElement(
+            Object.values(HeatingType).filter((v) => typeof v === 'string'),
+          ),
+          furnishingLevel: faker.helpers.arrayElement(
+            Object.values(FurnishingLevel).filter((v) => typeof v === 'string'),
+          ),
+          kitchenLevel: faker.helpers.arrayElement(
+            Object.values(KitchenLevel).filter((v) => typeof v === 'string'),
+          ),
 
-          bathrooms:faker.number.int({min:0,max:3 }),
-          airConditioner:faker.datatype.boolean()
-          }
-          
-        })
-        houseListingIds.push(xHouseListing.idHouse)
-        houseCitys.push(xHouseListing.city)
-         
-      
-      }
+          bathrooms: faker.number.int({ min: 0, max: 3 }),
+          airConditioner: faker.datatype.boolean(),
+        },
+      });
+      houseListingIds.push(xHouseListing.idHouse);
+      houseCitys.push(xHouseListing.city);
+    }
     //HouseSearchPrefrences*/
-    for (let i = 0 ;i<userIds.length; i++){
-      const xHouseSearchPrefrences=await tx.houseSearchPrefrences.create({
-        data:{
+    for (let i = 0; i < userIds.length; i++) {
+      const xHouseSearchPrefrences = await tx.houseSearchPrefrences.create({
+        data: {
+          user: { connect: { idUser: userIds[i] } },
 
-          user: {connect: {idUser: userIds[i]} },
-
-          maxRent:faker.number.int({min:100000, max:500000 }),
-          minSquareMeters :faker.number.int({min:10, max:80 }),
-          minRooms:faker.number.int({min:1, max:10 }),
-          city:faker.helpers.arrayElement(houseCitys),
-          propertyType: faker.helpers.arrayElement(Object.values(PropertyType).filter(v => typeof v === 'string')),
-          heatingType: faker.helpers.arrayElement(Object.values(HeatingType).filter(v => typeof v === 'string')),
-          furnishingLevel: faker.helpers.arrayElement(Object.values(FurnishingLevel).filter(v => typeof v === 'string')),
-          kitchenLevel: faker.helpers.arrayElement(Object.values(KitchenLevel).filter(v => typeof v === 'string')),
-          minBathrooms:faker.number.int({min:1, max:3 }),
-            
-        }
-      })
+          maxRent: faker.number.int({ min: 100000, max: 500000 }),
+          minSquareMeters: faker.number.int({ min: 10, max: 80 }),
+          minRooms: faker.number.int({ min: 1, max: 10 }),
+          city: faker.helpers.arrayElement(houseCitys),
+          propertyType: faker.helpers.arrayElement(
+            Object.values(PropertyType).filter((v) => typeof v === 'string'),
+          ),
+          heatingType: faker.helpers.arrayElement(
+            Object.values(HeatingType).filter((v) => typeof v === 'string'),
+          ),
+          furnishingLevel: faker.helpers.arrayElement(
+            Object.values(FurnishingLevel).filter((v) => typeof v === 'string'),
+          ),
+          kitchenLevel: faker.helpers.arrayElement(
+            Object.values(KitchenLevel).filter((v) => typeof v === 'string'),
+          ),
+          minBathrooms: faker.number.int({ min: 1, max: 3 }),
+        },
+      });
     }
 
     //LikedHouse
     const likedHouseSet = new Set<string>();
-    for (let i = 0 ;i<userIds.length; i++){
-      const likerId= faker.helpers.arrayElement(userIds)
-      const likedHouseId= faker.helpers.arrayElement(houseListingIds)
+    for (let i = 0; i < userIds.length; i++) {
+      const likerId = faker.helpers.arrayElement(userIds);
+      const likedHouseId = faker.helpers.arrayElement(houseListingIds);
       const pairKey = `${likerId}-${likedHouseId}`;
-      if (likedHouseSet.has(pairKey)) {continue;} //skip if already exists
+      if (likedHouseSet.has(pairKey)) {
+        continue;
+      } //skip if already exists
       likedHouseSet.add(pairKey);
-      const xLikedHouse=await tx.likedHouse.create({
-        data:{
-          user: {connect: {idUser: likerId} },
-          house : {connect: {idHouse: likedHouseId} },
-        }
-      })
+      const xLikedHouse = await tx.likedHouse.create({
+        data: {
+          user: { connect: { idUser: likerId } },
+          house: { connect: { idHouse: likedHouseId } },
+        },
+      });
     }
 
     //RoommateRatings
     const ratedRommates = new Set<string>();
-    for (let i = 0; i < userIds.length; i++){
-      const raterId = faker.helpers.arrayElement(userIds)
-      const ratedUserId = faker.helpers.arrayElement(userIds)
-      if(raterId == ratedUserId){continue}
-      const pairKey = `${raterId}-${ratedUserId}`
-      if(ratedRommates.has(pairKey)){continue}
-      ratedRommates.add(pairKey)
+    for (let i = 0; i < userIds.length; i++) {
+      const raterId = faker.helpers.arrayElement(userIds);
+      const ratedUserId = faker.helpers.arrayElement(userIds);
+      if (raterId == ratedUserId) {
+        continue;
+      }
+      const pairKey = `${raterId}-${ratedUserId}`;
+      if (ratedRommates.has(pairKey)) {
+        continue;
+      }
+      ratedRommates.add(pairKey);
       const xRating = await tx.roommateRatings.create({
-        data:{
+        data: {
           ratingMessage: faker.lorem.sentence(),
-          ratingScore: faker.number.int({min: 1,max:5}),
+          ratingScore: faker.number.int({ min: 1, max: 5 }),
           raterId: raterId,
-          ratedUserId: ratedUserId
-        }
-      })
+          ratedUserId: ratedUserId,
+        },
+      });
     }
 
     const ratedHouses = new Set<string>();
-    for (let i = 0; i < userIds.length; i++){
-      const raterId = faker.helpers.arrayElement(userIds)
-      const ratedHouseId = faker.helpers.arrayElement(houseListingIds)
-      if(raterId == ratedHouseId){continue}
-      const pairKey = `${raterId}-${ratedHouseId}`
-      if(ratedHouses.has(pairKey)){continue}
-      ratedHouses.add(pairKey)
+    for (let i = 0; i < userIds.length; i++) {
+      const raterId = faker.helpers.arrayElement(userIds);
+      const ratedHouseId = faker.helpers.arrayElement(houseListingIds);
+      if (raterId == ratedHouseId) {
+        continue;
+      }
+      const pairKey = `${raterId}-${ratedHouseId}`;
+      if (ratedHouses.has(pairKey)) {
+        continue;
+      }
+      ratedHouses.add(pairKey);
       const xRating = await tx.houseListingRatings.create({
-        data:{
+        data: {
           ratingMessage: faker.lorem.sentence(),
-          ratingScore: faker.number.int({min: 1,max:5}),
+          ratingScore: faker.number.int({ min: 1, max: 5 }),
           raterId: raterId,
-          ratedHouseId: ratedHouseId
-        }
-      })
+          ratedHouseId: ratedHouseId,
+        },
+      });
     }
 
+    //UserImages
+    for (let userId of userIds) {
+      //console.log(userId);
+      const links = faker.helpers.arrayElements(userPictureLinks, {
+        min: 3,
+        max: 5,
+      });
+      if (links.length == 0) {
+        continue;
+      }
+      for (let link of links) {
+        let isProf = false;
+        if (link == links[0]) {
+          isProf = true;
+        }
+        await tx.userImages.create({
+          data: {
+            userIdImages: userId,
+            key: 'key',
+            url: link,
+            IsProfile: isProf,
+          },
+        });
+      }
+    }
 
-
-    
-})
+    //HouseImages
+    for (let houseId of houseListingIds) {
+      const links = faker.helpers.arrayElements(housePictureLinks, {
+        min: 3,
+        max: 5,
+      });
+      if (links.length == 0) {
+        continue;
+      }
+      for (let link of links) {
+        let isProf = false;
+        if (link == links[0]) {
+          isProf = true;
+        }
+        await tx.houseImages.create({
+          data: {
+            houseIdImages: houseId,
+            key: 'key',
+            url: link,
+            IsProfile: isProf,
+          },
+        });
+      }
+    }
+  });
 }
 main()
   .then(async () => {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
