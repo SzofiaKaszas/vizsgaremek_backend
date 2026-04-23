@@ -196,6 +196,7 @@ model UserImages{
   user User @relation(fields: [userIdImages], references: [idUser])
 }
 
+
 //HouseListing Model to store house listings posted by users (done)
 //***HouseListing tables API is src/house-listing***
 model HouseListing {
@@ -224,6 +225,7 @@ model HouseListing {
   likedBy LikedHouse[] @relation("HouseListingLikedBy")
   ratedBy HouseListingRatings[] @relation("HouseListingRatedBy")
   images HouseImages[]
+
 }
 
 /**
@@ -287,12 +289,18 @@ model HouseListingRatings {
 
   @@unique([raterId,ratedHouseId])
 }
+
 //TODO: add content Hunor
 model HouseImages{
-  id Int @id @default(autoincrement())
-  userIdImages Int
+  idHouseImage Int @id @default(autoincrement())
+  houseIdImages Int
+  url String
+  deleted      Boolean @default(false)
+  uploadedAt DateTime @default(now())
+  key          String
+  IsProfile    Boolean @default(false)
   
   //Content
 
-  house HouseListing @relation(fields: [userIdImages], references: [idHouse])
+  house HouseListing @relation(fields: [houseIdImages], references: [idHouse])
 }
