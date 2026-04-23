@@ -23,7 +23,7 @@ const prisma = new PrismaClient();
 
 //TODO: added new tables seeding
 async function main() {
-  const USE_IMAGESERVER = false; //Set to false if you dont want to seed the userImages and houseImages tables, or if you dont have the test images uploaded to your s3 bucket
+  const USE_IMAGESERVER = true; //Set to false if you dont want to seed the userImages and houseImages tables, or if you dont have the test images uploaded to your s3 bucket
 
   const generateUserCount = 10;
   const generateHouseListingCount = 20;
