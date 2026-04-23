@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateHouseSearchPrefrenceDto } from './dto/create-house-search-prefrence.dto';
 import { UpdateHouseSearchPrefrenceDto } from './dto/update-house-search-prefrence.dto';
@@ -94,9 +97,22 @@ export class HouseSearchPrefrencesService {
       })
       .sort((a,b) => b.score - a.score);
 
-      return scored.map((s) => {
+      const matchedHouses = scored.map((s) => {
         return s.houseListing
       })
+      const matchedHousesWithImages = await Promise.all(matchedHouses.map(async (house) => {
+        const houseImages = await this.db.houseImages.findMany({
+          where: {
+            houseIdImages: house.idHouse,
+            deleted: false,
+          }
+        });
+      
+      
+        return { ...house, images: houseImages };}))
+    
+      return matchedHousesWithImages
+
 
 
 

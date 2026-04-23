@@ -318,7 +318,11 @@ export class UserService {
         }
       })
       const usersWhoLikedMe = likedBy.map((like) => like.liker)
-      return usersWhoLikedMe
+      const usersWithImages = await Promise.all(usersWhoLikedMe.map(async (user) => {
+        const userImages = await this.imageFind(user.idUser)
+        return {...user,images: userImages}
+      }))
+      return usersWithImages
     } catch (error) {
       handlePrismaError(error)
     }

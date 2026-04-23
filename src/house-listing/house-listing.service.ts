@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -72,7 +73,7 @@ export class HouseListingService {
 
   async getLikes(idUser: number) {
     try {
-      return await this.db.houseListing.findMany({
+      const likes =await this.db.houseListing.findMany({
         where:{
           likedBy:{
             some:{
@@ -81,6 +82,17 @@ export class HouseListingService {
           }
         }
       })
+      const likedHousesWithImages = await Promise.all(likes.map(async (house) => {
+        const houseImages = await this.db.houseImages.findMany({
+          where: {
+            houseIdImages: house.idHouse,
+            deleted: false,
+          }
+        });
+        return { ...house, images: houseImages };
+      }));
+      return likedHousesWithImages;
+
     } catch (error) {
       handlePrismaError(error)
     }
