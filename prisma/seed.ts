@@ -23,6 +23,8 @@ const prisma = new PrismaClient();
 
 //TODO: added new tables seeding
 async function main() {
+  const USE_IMAGESERVER = false; //Set to false if you dont want to seed the userImages and houseImages tables, or if you dont have the test images uploaded to your s3 bucket
+
   const generateUserCount = 10;
   const generateHouseListingCount = 20;
 
@@ -31,7 +33,7 @@ async function main() {
     const houseListingIds: number[] = [];
     const houseCitys: string[] = [];
 
-    const userPictureLinks: string[] = [
+    let userPictureLinks: string[] = [
       'http://localhost:9000/test-image/Profil/f1.jpg',
       'http://localhost:9000/test-image/Profil/f2.jpg',
       'http://localhost:9000/test-image/Profil/f3.jpg',
@@ -43,7 +45,7 @@ async function main() {
       'http://localhost:9000/test-image/Profil/L4.jpg',
       'http://localhost:9000/test-image/Profil/L5.jpg',
     ];
-    const housePictureLinks: string[] = [
+    let housePictureLinks: string[] = [
       'http://localhost:9000/test-image/House/H1.jpg',
       'http://localhost:9000/test-image/House/H2.jpg',
       'http://localhost:9000/test-image/House/H3.jpg',
@@ -53,6 +55,31 @@ async function main() {
       'http://localhost:9000/test-image/House/H7.jpg',
       'http://localhost:9000/test-image/House/H8.jpg',
     ];
+
+    if (!USE_IMAGESERVER) {
+      userPictureLinks = [
+        'https://cdn.pixabay.com/photo/2022/12/06/17/37/man-7639385_1280.jpg',
+        'https://cdn.pixabay.com/photo/2019/09/01/10/13/man-4444765_1280.jpg',
+        'https://cdn.pixabay.com/photo/2015/03/03/08/55/portrait-657116_1280.jpg',
+        'https://cdn.pixabay.com/photo/2014/04/12/14/59/portrait-322470_1280.jpg',
+        'https://cdn.pixabay.com/photo/2014/04/12/14/59/portrait-322470_1280.jpg',
+        'https://cdn.pixabay.com/photo/2019/11/30/12/11/girl-4663127_1280.jpg',
+        'https://cdn.pixabay.com/photo/2021/12/22/01/41/man-6886497_1280.jpg',
+        'https://cdn.pixabay.com/photo/2022/07/02/13/48/man-7297322_1280.jpg',
+        'https://cdn.pixabay.com/photo/2019/11/30/22/38/girl-4664440_1280.jpg',
+        'https://cdn.pixabay.com/photo/2019/11/30/12/12/girl-4663129_1280.jpg',
+      ];
+      housePictureLinks = [
+        'https://cdn.pixabay.com/photo/2020/06/25/10/21/architecture-5339245_1280.jpg',
+        'https://cdn.pixabay.com/photo/2020/12/16/00/10/home-5835289_1280.jpg',
+        'https://cdn.pixabay.com/photo/2014/08/11/21/39/wall-416060_1280.jpg',
+        'https://cdn.pixabay.com/photo/2016/11/18/17/20/living-room-1835923_1280.jpg',
+        'https://cdn.pixabay.com/photo/2015/10/20/18/57/furniture-998265_1280.jpg',
+        'https://cdn.pixabay.com/photo/2016/09/19/17/20/home-1680800_1280.jpg',
+        'https://cdn.pixabay.com/photo/2023/01/14/14/16/staircase-7718335_1280.jpg',
+        'https://cdn.pixabay.com/photo/2023/01/10/20/56/nyc-7710506_1280.jpg',
+      ];
+    }
 
     //Admin
     const xAdmin = await tx.user.create({
