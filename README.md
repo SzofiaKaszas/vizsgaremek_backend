@@ -58,6 +58,9 @@ npm run start
 A backend alapértelmezetten a következő címen érhető el:
 http://localhost:3000
 
+A swagger-el történt dokumentációt itt érhető el:
+http://localhost:3000/apidoc
+
 ---
 
 ## Használt technológiák
