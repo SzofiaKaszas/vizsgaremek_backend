@@ -110,6 +110,60 @@ export class UserController {
   }
 
   /**
+   * Returns users who have liked the current user
+   * 
+   * @param request 
+   * @returns 
+   */
+  @Get('likes-received')
+  @ApiOkResponse({
+    description: 'Returns list of users who liked the current user',
+    type: UserBaseDto,
+    isArray: true
+  })
+  @ApiForbiddenResponse({
+    description: 'Invalid token'
+  })
+  @ApiUnauthorizedResponse({
+    description: 'No authorization'
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  getLikesReceived(
+    @Request() request
+  ){
+    const user = request.user as User
+    return this.userService.getLikesRecieved(user.idUser)
+  }
+
+  /**
+   * Returns users have matched with the current user
+   * 
+   * @param request 
+   * @returns 
+   */
+  @Get('likes-matches')
+  @ApiOkResponse({
+    description: 'Returns list of users who the current user liked and they also liked the current user',
+    type: UserBaseDto,
+    isArray: true
+  })
+  @ApiForbiddenResponse({
+    description: 'Invalid token'
+  })
+  @ApiUnauthorizedResponse({
+    description: 'No authorization'
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('bearer'))
+  getLikesMatches(
+    @Request() request
+  ){
+    const user = request.user as User
+    return this.userService.getLikesMatches(user.idUser)
+  }
+
+  /**
    * Returns necessary data of user on parameter id
    */
   @Get(':id/necessary')

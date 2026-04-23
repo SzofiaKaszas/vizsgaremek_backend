@@ -33,28 +33,7 @@ export class UserService {
  
   
   
-  constructor(private readonly db: PrismaService, /*private readonly imageService : ImagesService*/) {}
-
-  async imageFind(userId){
-    try {
-      const images = await this.db.userImages.findMany({
-        where: {
-          userIdImages: userId,
-          deleted: false,
-        },
-      });
-      return images;
-    } catch (error) {
-      handlePrismaError(error);
-    }
-  }
-
-  async me(user: User) {
-    
-    const images = await this.imageFind(user.idUser)
-    return {...user,images}
-  }
-
+  constructor(private readonly db: PrismaService) {}
 
   //create a new user with hashed password
   /**
@@ -267,6 +246,58 @@ export class UserService {
       return { action: 'created', data: createdLike };
     } catch (error) {
       handlePrismaError(error);
+    }
+  }
+
+  async getLikesMatches(idUser: number) {
+    try {
+      const mutual = await this.db.likedRoommate.findMany({
+        where:{
+          likerId: idUser,
+          liked:{
+            role: "user",
+            likedRoommates:{
+              some:{
+                likedUserId: idUser
+              }
+            }
+          }
+        },
+        include:{
+          liked:{
+            omit:{
+              password: true
+            }
+          }
+        }
+      })
+      const mutualUsers = mutual.map((mut) => mut.liked)
+      return mutualUsers
+    } catch (error) {
+      handlePrismaError(error)
+    }
+  }
+  async getLikesRecieved(idUser: number) {
+    try {
+      const likedBy = await this.db.likedRoommate.findMany({
+        where:{
+          likedUserId: idUser,
+          liker: {
+            role: "user"
+          }
+        },
+        include:{
+          liker:{
+            omit:{
+              password:true
+            },
+          }
+        }
+      })
+      const usersWhoLikedMe = likedBy.map((like) => like.liker)
+      return usersWhoLikedMe
+    } catch (error) {
+      handlePrismaError(error)
     }
   }
 
