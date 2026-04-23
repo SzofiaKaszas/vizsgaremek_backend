@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
@@ -90,6 +93,26 @@ export class UserService {
       //console.log(error)
       handlePrismaError(error);
     }
+  }
+
+  async imageFind(userId){
+    try {
+      const images = await this.db.userImages.findMany({
+        where: {
+          userIdImages: userId,
+          deleted: false,
+        },
+      });
+      return images;
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async me(user: User) {
+    
+    const images = await this.imageFind(user.idUser)
+    return {...user,images}
   }
 
   /**
