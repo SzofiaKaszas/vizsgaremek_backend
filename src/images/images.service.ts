@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   BadRequestException,
   Injectable,
@@ -223,6 +227,18 @@ export class ImagesService {
 
   async deletHouseImage( houseImageId: number, user: User) {
     try {
+      /*const image = await this.db.userImages.findUnique({
+        where: { id },
+      });*/
+      const house = await this.db.houseListing.findUnique({
+        where:{idHouse:houseImageId}
+      })
+      if (!house) {
+        throw new NotFoundException();
+      }
+      if (!isAuthorized(user, house.houseIdUser)) {
+        throw new UnauthorizedException();
+      }
       const image = await this.db.houseImages.findUnique({
         where: { idHouseImage: houseImageId },
       });

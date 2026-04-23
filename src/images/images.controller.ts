@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { BadRequestException,UseInterceptors, UploadedFile,Controller, Get, Post, Body, Patch, Param,ParseIntPipe, Delete, Request, UseGuards } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { CreateImageDto } from './dto/create-image.dto';
@@ -105,7 +107,7 @@ export class ImagesController {
   }
 
 
-  @Delete(":imageId")
+  @Delete("user/:imageId")
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   deletImag(
@@ -115,7 +117,7 @@ export class ImagesController {
     const user = request.user as User
     return this.imagesService.deletImag(imageId,user)
   }
-  @Delete(":houseImageId")
+  @Delete("house/:houseImageId")
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   deletHouseImage(
