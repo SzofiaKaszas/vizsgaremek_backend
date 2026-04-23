@@ -109,6 +109,7 @@ model User {
   ratedBy             RoommateRatings[]      @relation("UserRoommateRatedBy")
   likedHouses         LikedHouse[]           @relation("UserHouseListingLikes")
   ratedHouses         HouseListingRatings[]    @relation("UserHouseListingRatings")
+  images UserImages[]
 
 }
 
@@ -180,6 +181,22 @@ model RoommatesPrefrences {
   user User? @relation(fields: [roommatesPrefrencesIdUser], references: [idUser]) //relation to User model but not everyone is looking for roommates
 }
 
+//TODO: add content
+model UserImages{
+  id           Int @id @default(autoincrement())
+  userIdImages Int
+  key          String
+  IsProfile    Boolean @default(false)
+  deleted      Boolean @default(false)
+  url          String
+  createdAt    DateTime @default(now())
+
+  //Content
+
+  user User @relation(fields: [userIdImages], references: [idUser])
+}
+
+
 //HouseListing Model to store house listings posted by users (done)
 //***HouseListing tables API is src/house-listing***
 model HouseListing {
@@ -207,6 +224,8 @@ model HouseListing {
   //images HouseImage[]
   likedBy LikedHouse[] @relation("HouseListingLikedBy")
   ratedBy HouseListingRatings[] @relation("HouseListingRatedBy")
+  images HouseImages[]
+
 }
 
 /**
@@ -269,4 +288,19 @@ model HouseListingRatings {
   rated HouseListing @relation("HouseListingRatedBy",fields: [ratedHouseId], references: [idHouse], onDelete: Cascade)
 
   @@unique([raterId,ratedHouseId])
+}
+
+//TODO: add content Hunor
+model HouseImages{
+  idHouseImage Int @id @default(autoincrement())
+  houseIdImages Int
+  url String
+  deleted      Boolean @default(false)
+  uploadedAt DateTime @default(now())
+  key          String
+  IsProfile    Boolean @default(false)
+  
+  //Content
+
+  house HouseListing @relation(fields: [houseIdImages], references: [idHouse])
 }

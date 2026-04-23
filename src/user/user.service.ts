@@ -22,12 +22,15 @@ import {
 } from '../helperFunctions/helpers';
 import { CreateRatingDto, UpdateRatingDto } from './dto/create-rating.dto';
 import { Language,UserGender } from "generated/prisma/enums";
+import { User } from 'generated/prisma/client';
+import {ImagesService} from '../images/images.service'
 
 /**
  * The user handler class
  */
 @Injectable()
 export class UserService {
+ 
   
   
   constructor(private readonly db: PrismaService) {}
@@ -158,10 +161,12 @@ export class UserService {
    */
   async findOne(id: number) {
     try {
-      return await this.db.user.findUniqueOrThrow({
+      const user = await this.db.user.findUniqueOrThrow({
         where: { idUser: id,role: "user" },
         omit: { password: true },
       });
+      const images = await this.imageFind(id)
+      return {...user,images}
     } catch (error) {
       handlePrismaError(error);
     }
@@ -195,7 +200,7 @@ export class UserService {
             }
           },
           role: "user"
-        },
+        }, 
         omit:{
           password: true
         }

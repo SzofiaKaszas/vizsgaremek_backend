@@ -13,6 +13,7 @@ import {
   ParseIntPipe,
   UnauthorizedException,
   Res,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
@@ -104,7 +105,8 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   getCurrentUser(@Request() request) {
-    return request.user as User;
+    const user = request.user as User
+    return this.userService.me(user);
   }
 
   /**
@@ -297,6 +299,7 @@ export class UserController {
     //console.log("like called")
     const user = request.user as User
     const result = await this.userService.likeUser(user.idUser,id)
+    if(result === undefined){ throw new InternalServerErrorException}
     const data = result.data
     if(result.action == 'created'){
       return res.status(201).send({data})

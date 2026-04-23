@@ -68,7 +68,7 @@ export class UserTokenController {
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     const user = await this.userTokenService.findByEmail(loginDto.email);
-    if (user === null) {
+    if (user === null || user === undefined) {
       throw new ForbiddenException('Invalid email or password');
     }
     if (!(await argon2.verify(user.password, loginDto.password))) {
