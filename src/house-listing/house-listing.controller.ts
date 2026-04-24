@@ -7,14 +7,14 @@ import { CreateHouseListingDto } from './dto/create-house-listing.dto';
 import { UpdateHouseListingDto } from './dto/update-house-listing.dto';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import {isAuthorized} from "../helperFunctions/helpers"
+import { isAuthorized } from "../helperFunctions/helpers"
 import { User } from 'generated/prisma/client';
 import { CreateRatingDto, UpdateRatingDto } from 'src/user/dto/create-rating.dto';
 import type { Response } from 'express';
 
 @Controller('house-listing')
 export class HouseListingController {
-  constructor(private readonly houseListingService: HouseListingService) {}
+  constructor(private readonly houseListingService: HouseListingService) { }
 
   /**
    * Creates a new house listing
@@ -27,7 +27,7 @@ export class HouseListingController {
    */
   @Post()
   @ApiBody({
-    type : CreateHouseListingDto
+    type: CreateHouseListingDto
   })
   @ApiCreatedResponse({
     description: "Successfully created the new house listing",
@@ -46,15 +46,17 @@ export class HouseListingController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
-  create(
+  async create(
     @Body() createHouseListingDto: CreateHouseListingDto,
     @Request() request
   ) {
     const user = request.user as User
-    if(isAuthorized(user, createHouseListingDto.houseIdUser)){
-      return this.houseListingService.create(createHouseListingDto);
+    if (isAuthorized(user, createHouseListingDto.houseIdUser)) {
+      const newHouse = await this.houseListingService.create(createHouseListingDto);
+
+      return newHouse;
     }
-    else{
+    else {
       throw new UnauthorizedException('Acces not authorized')
     }
   }
@@ -77,7 +79,7 @@ export class HouseListingController {
   @UseGuards(AuthGuard('bearer'))
   getLikes(
     @Request() request,
-  ){
+  ) {
     const user = request.user as User
     return this.houseListingService.getLikes(user.idUser)
   }
@@ -140,7 +142,7 @@ export class HouseListingController {
     return this.houseListingService.findOne(id);
   }
 
-  
+
   /**
    * Likes a house listing or removes the like if already liked
    * @param id House listing ID
@@ -175,18 +177,18 @@ export class HouseListingController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   async like(
-    @Param('id', ParseIntPipe) id:number,
+    @Param('id', ParseIntPipe) id: number,
     @Request() request,
-    @Res() res : Response
-  ){
+    @Res() res: Response
+  ) {
     const user = request.user as User
-    const result = await this.houseListingService.likeHouse(user.idUser,id)
-    if(!result){throw new InternalServerErrorException}
-    const data = result.data 
-    if(result.action == 'created'){
-      return res.status(201).send({data})
+    const result = await this.houseListingService.likeHouse(user.idUser, id)
+    if (!result) { throw new InternalServerErrorException }
+    const data = result.data
+    if (result.action == 'created') {
+      return res.status(201).send({ data })
     }
-    return res.status(200).send({data})
+    return res.status(200).send({ data })
   }
 
   /**
@@ -227,12 +229,12 @@ export class HouseListingController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   rate(
-    @Param('id', ParseIntPipe) id:number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() createRatingDto: CreateRatingDto,
     @Request() request
-  ){
+  ) {
     const user = request.user as User
-    return this.houseListingService.rateHouse(user.idUser,id,createRatingDto)
+    return this.houseListingService.rateHouse(user.idUser, id, createRatingDto)
   }
 
   /**
@@ -273,13 +275,13 @@ export class HouseListingController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   updateRating(
-    @Param('id', ParseIntPipe) id : number,
-    @Body() updateRatingDto : UpdateRatingDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateRatingDto: UpdateRatingDto,
     @Request() request
-  ){
+  ) {
     const user = request.user as User
-    
-    return this.houseListingService.updateratingHouse(user.idUser,id,updateRatingDto)
+
+    return this.houseListingService.updateratingHouse(user.idUser, id, updateRatingDto)
   }
 
   /**
@@ -320,21 +322,21 @@ export class HouseListingController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
   update(
-    @Param('id', ParseIntPipe) id: number, 
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateHouseListingDto: UpdateHouseListingDto,
     @Request() request
   ) {
     const user = request.user as User
-    if(!updateHouseListingDto.houseIdUser){
+    if (!updateHouseListingDto.houseIdUser) {
       throw new BadRequestException('Request body must contain houseIdUser')
     }
-    if(id != updateHouseListingDto.houseIdUser){
+    if (id != updateHouseListingDto.houseIdUser) {
       throw new BadRequestException('Request body houseIdUser must not be different from updateHouseListingDto')
     }
-    if(isAuthorized(user, updateHouseListingDto.houseIdUser)){
+    if (isAuthorized(user, updateHouseListingDto.houseIdUser)) {
       return this.houseListingService.update(id, updateHouseListingDto);
     }
-    else{
+    else {
       throw new UnauthorizedException('Acces not authorized')
     }
   }
@@ -377,10 +379,10 @@ export class HouseListingController {
     @Request() request
   ) {
     const user = request.user as User
-    if(isAuthorized(user, id)){
+    if (isAuthorized(user, id)) {
       return this.houseListingService.remove(id);
     }
-    else{
+    else {
       throw new UnauthorizedException('Acces not authorized')
     }
   }
