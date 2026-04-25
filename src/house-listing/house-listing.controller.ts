@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UnauthorizedException, ParseIntPipe, BadRequestException, Res, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UnauthorizedException, ParseIntPipe, BadRequestException, Res, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { HouseListingService } from './house-listing.service';
 import { CreateHouseListingDto } from './dto/create-house-listing.dto';
 import { UpdateHouseListingDto } from './dto/update-house-listing.dto';
@@ -321,24 +321,23 @@ export class HouseListingController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('bearer'))
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateHouseListingDto: UpdateHouseListingDto,
     @Request() request
   ) {
     const user = request.user as User
-    if (!updateHouseListingDto.houseIdUser) {
-      throw new BadRequestException('Request body must contain houseIdUser')
+    const listing = await this.houseListingService.findOne(id);
+    
+    if (!listing) {
+      throw new NotFoundException('House listing not found');
     }
-    if (id != updateHouseListingDto.houseIdUser) {
-      throw new BadRequestException('Request body houseIdUser must not be different from updateHouseListingDto')
+
+    if (!isAuthorized(user, listing.houseIdUser)) {
+      throw new UnauthorizedException('Access not authorized');
     }
-    if (isAuthorized(user, updateHouseListingDto.houseIdUser)) {
-      return this.houseListingService.update(id, updateHouseListingDto);
-    }
-    else {
-      throw new UnauthorizedException('Acces not authorized')
-    }
+
+    return this.houseListingService.update(id, updateHouseListingDto);
   }
 
   /**
